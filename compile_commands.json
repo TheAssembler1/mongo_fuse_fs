@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/theassembler1/src/mongo_fuse_fs/build",
-  "command": "/usr/bin/c++ -D_FILE_OFFSET_BITS=64 -I/home/theassembler1/src/mongo_fuse_fs/external/fuse/build -std=gnu++11 -o CMakeFiles/mongo_fuse_fs.dir/src/entry.cpp.o -c /home/theassembler1/src/mongo_fuse_fs/src/entry.cpp",
+  "command": "/usr/bin/c++    -I/usr/local/include/fuse3 -std=gnu++11 -o CMakeFiles/mongo_fuse_fs.dir/src/entry.cpp.o -c /home/theassembler1/src/mongo_fuse_fs/src/entry.cpp",
   "file": "/home/theassembler1/src/mongo_fuse_fs/src/entry.cpp"
 }
 ]

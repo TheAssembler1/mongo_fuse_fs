@@ -1,11 +1,14 @@
 #!/bin/bash
 
-stat mnt_pt || { echo "mnt_pt does not exists"; exit 0; }
+if [ -d mnt ]
+then
+  echo "found mnt dir"
+else
+  echo "no mnt dir found"
+  exit 0
+fi
 
-ORIGINAL_PATH=$PATH
-export PATH="external/fuse/build/util:$PATH"
-
-umount mnt_pt || { echo "Failed to unmnt mongo_fuse_fs"; exit 1; }
-
-export PATH=$ORIGINAL_PATH
-
+echo "unmounting mnt dir"
+sudo umount mnt || { echo "Failed to unmnt mongo_fuse_fs"; exit 1; }
+rmdir mnt
+rm filesystem.log

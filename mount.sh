@@ -1,10 +1,13 @@
 #!/bin/bash
 
-ORIGINAL_PATH=$PATH
-export PATH="external/fuse/build/util:$PATH"
-
 ./umount.sh
-mkdir mnt_pt 
-mount -t fuse -f -s build/mongo_fuse_fs mnt_pt || { echo "Failed to mnt mongo_fuse_fs"; exit 1; }
+if [ -d mnt ] 
+then
+  echo "dir mnt exists"
+else
+  echo "creating mnt dir"
+  mkdir mnt
+fi
 
-export PATH=$ORIGINAL_PATH
+echo "mounting mongo_fuse_fs to mnt"
+./build/mongo_fuse_fs -f mnt > filesystem.log 2>&1 &

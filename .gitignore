@@ -2,3 +2,5 @@ build
 external
 mnt_pt
 .cache
+*.log
+mnt

@@ -5,12 +5,25 @@ project(${PROJECT_NAME})
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 11)
 
-# external dependencies path
-set(FUSE_LIBRARIES "${CMAKE_CURRENT_LIST_DIR}/external/fuse/build/lib/libfuse3.so")
-set(FUSE_HEADERS "${CMAKE_CURRENT_LIST_DIR}/external/fuse/build")
+# Get compiler flags from pkg-config
+execute_process(
+    COMMAND pkg-config fuse3 --cflags
+    OUTPUT_VARIABLE FUSE_CFLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# Add include directories
-include_directories(${FUSE_HEADERS})
+# Get linker flags from pkg-config
+execute_process(
+    COMMAND pkg-config fuse3 --libs
+    OUTPUT_VARIABLE FUSE_LIBS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Set compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FUSE_CFLAGS}")
+
+# Set linker flags
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${FUSE_LIBS}")
 
 # Add your source files
 set(SOURCES
@@ -19,8 +32,5 @@ set(SOURCES
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Link against FUSE library
-target_compile_definitions(${PROJECT_NAME} PRIVATE -D_FILE_OFFSET_BITS=64)
-target_link_libraries(${PROJECT_NAME} ${FUSE_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${FUSE_LIBS})
 
