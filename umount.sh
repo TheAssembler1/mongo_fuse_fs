@@ -11,6 +11,7 @@ else
 fi
 
 echo "unmounting mnt dir"
-sudo umount mnt || { echo "Failed to unmnt mongo_fuse_fs"; exit 1; }
+sudo umount mnt || { echo "Failed to unmnt mongo_fuse_fs"; }
+fusermount -u mnt
 rmdir mnt
 rm filesystem.log

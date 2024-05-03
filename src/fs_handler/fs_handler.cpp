@@ -1,8 +1,9 @@
 #include <iostream>
 
 #include "fs_handler.h"
+#include "../mongo_manager/mongo_manager.h"
 
-#define U {/*throw std::runtime_error("function unimplemented");*/std::cerr << "HERE" << std::endl; return 0;}
+#define U {std::cerr << "unimplemented method: " << __FUNCTION__ << std::endl; return 0;}
 
 namespace operations = mongo_fuse_fs::operations;
 
@@ -20,7 +21,6 @@ int operations::getattr(const char* path, struct stat* stat, fuse_file_info* fus
   stat->st_size = 0;
   stat->st_blksize = 0;
   stat->st_blocks = 0;
-std::cout << "creating mongo db instance" << std::endl;
 
   printf("getattr path=%s\n", path);
   stat->st_dev = 2049;
@@ -69,14 +69,24 @@ int operations::opendir(const char* path, fuse_file_info*) {
   return 0;
 }
 
-int operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) {
-  std::cout << "readdir path=" << path << std::endl;
+int operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) { std::cout << "readdir path=" << path << std::endl;
   return 0;
 }
 
 int operations::releasedir(const char*, fuse_file_info*);
 int operations::fsyncdir(const char*, int, fuse_file_info*) U;
-void* operations::init(fuse_conn_info*, fuse_config*) U;
+
+void* operations::init(fuse_conn_info*, fuse_config* fg) {
+  std::cout << "fs init call" << std::endl;
+
+  std::cout << "nullpath_ok set to true" << std::endl;
+  fg->nullpath_ok = true;
+
+  mongo_fuse_fs::mongo_manager::init_db(); 
+
+  return nullptr;
+}
+
 void operations::destroy(void*) {}; 
 int operations::access(const char*, int) U;
 
@@ -85,7 +95,12 @@ int operations::create(const char*, mode_t, fuse_file_info*) {
 }
 
 int operations::lock(const char*, fuse_file_info*, int, struct flock*) U;
-int operations::utimens(const char*, const timespec*, fuse_file_info*) U;
+
+int operations::utimens(const char* path, const timespec*, fuse_file_info*) {
+  std::cout << "utimens call" << path << std::endl;
+  return 0;
+}
+
 int operations::bmap(const char*, size_t, uint64_t*) U;
 int operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigned int, void*) U;
 int operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U;
