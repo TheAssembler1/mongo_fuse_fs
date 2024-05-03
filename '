@@ -1,0 +1,11 @@
+#pragma once
+
+#include "mongocxx"
+
+namespace MongoFuseFS {
+  class MongoConnection {
+    public:
+    private:
+      static const mongocxx::instance inst;
+  };
+}

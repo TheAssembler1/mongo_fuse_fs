@@ -4,5 +4,17 @@
   "command": "/usr/bin/c++  -I/home/theassembler1/src/mongo_fuse_fs/external/fuse3/install/include/fuse3 -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi -std=gnu++17 -o CMakeFiles/mongo_fuse_fs.dir/src/entry.cpp.o -c /home/theassembler1/src/mongo_fuse_fs/src/entry.cpp",
   "file": "/home/theassembler1/src/mongo_fuse_fs/src/entry.cpp",
   "output": "CMakeFiles/mongo_fuse_fs.dir/src/entry.cpp.o"
+},
+{
+  "directory": "/home/theassembler1/src/mongo_fuse_fs/build",
+  "command": "/usr/bin/c++  -I/home/theassembler1/src/mongo_fuse_fs/external/fuse3/install/include/fuse3 -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi -std=gnu++17 -o CMakeFiles/mongo_fuse_fs.dir/src/fs_handler/fs_handler.cpp.o -c /home/theassembler1/src/mongo_fuse_fs/src/fs_handler/fs_handler.cpp",
+  "file": "/home/theassembler1/src/mongo_fuse_fs/src/fs_handler/fs_handler.cpp",
+  "output": "CMakeFiles/mongo_fuse_fs.dir/src/fs_handler/fs_handler.cpp.o"
+},
+{
+  "directory": "/home/theassembler1/src/mongo_fuse_fs/build",
+  "command": "/usr/bin/c++  -I/home/theassembler1/src/mongo_fuse_fs/external/fuse3/install/include/fuse3 -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi -I/home/theassembler1/src/mongo_fuse_fs/external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi -std=gnu++17 -o CMakeFiles/mongo_fuse_fs.dir/src/mongo_manager/mongo_manager.cpp.o -c /home/theassembler1/src/mongo_fuse_fs/src/mongo_manager/mongo_manager.cpp",
+  "file": "/home/theassembler1/src/mongo_fuse_fs/src/mongo_manager/mongo_manager.cpp",
+  "output": "CMakeFiles/mongo_fuse_fs.dir/src/mongo_manager/mongo_manager.cpp.o"
 }
 ]
