@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm filesystem.log
+
 if [ -d mnt ]
 then
   echo "found mnt dir"

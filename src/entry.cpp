@@ -7,6 +7,19 @@
 #include <fuse.h>
 #include <sys/stat.h>
 
+#include <cstdint>
+#include <vector>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/uri.hpp>
+
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_array;
+using bsoncxx::builder::basic::make_document;
+
 #define U {/*throw std::runtime_error("function unimplemented");*/std::cerr << "HERE" << std::endl; return 0;}
 
 namespace MongoFuseFS {
@@ -138,11 +151,34 @@ static struct fuse_operations myfs_ops = {
   .fallocate = MongoFuseFS::fallocate,*/
 };
 
+static mongocxx::instance inst;
+
 int main(int argc, char *argv[]) {
-  //freopen("fuse_stdout.log", "w", stdout);
-  //freopen("fuse_stderr.log", "w", stderr);
-  
   std::cout << "mongo fuse filesystem mounted" << std::endl;
+  mongocxx::uri uri("mongodb://localhost:27017");
+  std::cout << "creating mongo uri" << std::endl;
+  auto api = mongocxx::options::server_api{ mongocxx::options::server_api::version::k_version_1 };
+  std::cout << "creating api options version 1" << std::endl;
+  mongocxx::options::client client_options;
+  std::cout << "creating client options" << std::endl;
+  client_options.server_api_opts(api);
+  std::cout << "applying options to client options" << std::endl;
+  mongocxx::client conn(uri, client_options);
+  std::cout << "creating a connection" << std::endl;
+  auto dbs = conn.list_database_names();
+  for(auto db: dbs) {
+    std::cout << db << std::endl;
+  }
+  auto database = conn["test_db"];
+  std::cout << "creating test database" << std::endl;
+  auto colleciton = database["test_collection"];
+  std::cout << "creating test collection" << std::endl;
+  auto find_one_result = colleciton.find_one({});
+  if(find_one_result) {
+    std::cout << "found one result" << std::endl;
+  } else {
+    std::cout << "no documents found" << std::endl;
+  }
 
   return fuse_main(argc, argv, &myfs_ops, NULL);
 }
