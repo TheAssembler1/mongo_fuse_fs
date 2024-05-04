@@ -4,3 +4,4 @@ mnt_pt
 .cache
 *.log
 mnt
+.vscode

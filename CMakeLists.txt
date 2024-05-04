@@ -22,8 +22,10 @@ set(EXTERNAL_HEADERS
 # Add your source files
 set(SOURCES
     src/entry.cpp
-    src/fs_handler/fs_handler.cpp
-    src/mongo_manager/mongo_manager.cpp
+    src/fs/handler.cpp
+    src/fs/perm.cpp
+    src/mongo/manager.cpp
+    src/mongo/md_entry.cpp
 )
 
 # Create executable
