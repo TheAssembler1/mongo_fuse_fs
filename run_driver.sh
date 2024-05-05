@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./driver/build/driver
+./driver/build/driver $(pwd)/mnt
