@@ -1,8 +1,2 @@
-build
-external
-mnt_pt
-.cache
-*.log
 mnt
 .vscode
-build_mongo_fuse_fs
