@@ -25,13 +25,7 @@ namespace fs {
     public:
       Mode(Perm user_perm, Perm group_perm, Perm univ_perm) 
         : user_perm{user_perm}, group_perm{group_perm}, univ_perm{univ_perm} {}
-
-
-      Mode(mode_t mode) {
-        user_perm = Perm{(bool)(mode & S_IRUSR), (bool)(mode & S_IWUSR), bool(mode & S_IXUSR)};
-        group_perm = Perm{(bool)(mode & S_IRUSR), (bool)(mode & S_IWUSR), bool(mode & S_IXUSR)};
-        univ_perm = Perm{(bool)(mode & S_IRUSR), (bool)(mode & S_IWUSR), bool(mode & S_IXUSR)};
-      }
+      Mode(mode_t mode);
 
       Mode() {
         user_perm = Perm{false, false, false};

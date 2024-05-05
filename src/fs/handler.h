@@ -2,6 +2,7 @@
 
 // NOTE: needed to establish fuse version early
 #define FUSE_USE_VERSION 35
+#define HAVE_SETXATTR 1
 #include <fuse.h>
 
 namespace fs {
@@ -26,10 +27,12 @@ namespace fs {
     static int flush(const char*, fuse_file_info*);
     static int release(const char*, fuse_file_info*);
     static int fsync(const char*, int, fuse_file_info*);
+    #if HAVE_SETXATTR
     static int setxattr(const char*, const char*, const char*, size_t, int);
     static int getxattr(const char*, const char*, char*, size_t);
     static int listxattr(const char*, char*, size_t);
     static int removexattr(const char*, const char*);
+    #endif
     static int opendir(const char* path, fuse_file_info*);
     static int readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf);
     static int releasedir(const char*, fuse_file_info*);
@@ -71,10 +74,12 @@ namespace fs {
         .flush = flush,
         .release = release,
         .fsync = fsync,
+        #ifdef HAVE_SETXATTR
         .setxattr = setxattr,
         .getxattr = getxattr,
         .listxattr = listxattr,
         .removexattr = removexattr,
+        #endif
         .opendir = opendir,
         .readdir = readdir,
         .fsyncdir = fsyncdir,
@@ -95,6 +100,7 @@ namespace fs {
 
 
       static constexpr struct fuse_config mongo_fuse_fs_config  {
+        .use_ino = true,
         .nullpath_ok = true,
       };
   };

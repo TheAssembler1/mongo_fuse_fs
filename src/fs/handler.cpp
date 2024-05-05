@@ -1,5 +1,7 @@
 #include <iostream>
 #include <memory.h>
+#include <stddef.h>
+#include <fcntl.h>
 
 #include "handler.h"
 #include "../mongo/manager.h"
@@ -43,19 +45,26 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     return -ENOENT;
   }
   
-  std::optional<mongo::MDEntry> md_entry = std::nullopt;
+  std::optional<mongo::MDEntry> md_entry_opt = std::nullopt;
   if (!ffi) {
     std::cout << "ffi null searching by path" << std::endl;
-    md_entry = mongo::MDEntry::search_by_path(path);
+    md_entry_opt = mongo::MDEntry::search_by_path(path);
   } else {
     std::cout << "ffi null searching by path" << std::endl;
-    md_entry = mongo::MDEntry::search_by_fd(ffi->fh);
+    md_entry_opt = mongo::MDEntry::search_by_fd(ffi->fh);
   }
 
-  if(md_entry.has_value()) {
-
-    stat->st_mode = S_IFREG | 0644;
+  if(md_entry_opt.has_value()) {
+    mongo::MDEntry md_entry = md_entry_opt.value();
+    stat->st_ino = md_entry.fd;
+    stat->st_mode = md_entry.to_mode_t();
     stat->st_size = 0;
+    stat->st_gid = md_entry.gid;
+    stat->st_uid = md_entry.uid;
+    stat->st_atim = std::timespec{md_entry.last_access, 0};
+    stat->st_ctim = std::timespec{md_entry.last_change, 0};
+    stat->st_mtim = std::timespec{md_entry.last_modify, 0};
+    stat->st_blksize = BLOCK_SIZE;
 
     return FS_OPERATION_SUCCESS;
   }
@@ -74,17 +83,62 @@ int Operations::link(const char*, const char*) U;
 int Operations::chmod(const char*, mode_t, fuse_file_info*) U;
 int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U;
 int Operations::truncate(const char*, off_t, fuse_file_info*) U;
-int Operations::open(const char*, fuse_file_info*) U;
+
+int Operations::open(const char* path, fuse_file_info* ffi) {
+  std::optional<mongo::MDEntry> md_entry_opt = std::nullopt;
+
+  std::cout << "open called with path: " << path << std::endl;
+  md_entry_opt = mongo::MDEntry::search_by_path(path);
+
+  if(!md_entry_opt.has_value()) {
+    return -ENOENT;
+  }
+
+  mongo::MDEntry md_entry = md_entry_opt.value();
+
+  std::cout << "found doc with fd: " << md_entry.fd << std::endl;
+  ffi->fh = md_entry.fd;
+
+  // FIXME: bad string output. maybe build up string?
+  std::cout << "file opened with the following flags: ";
+
+  // exclusive file flags
+  if(ffi->flags & O_RDONLY) {
+    std::cout << std::endl;
+    return FS_OPERATION_SUCCESS;
+  }
+  if(ffi->flags & O_WRONLY) {
+    std::cout << "O_WRONLY ";
+    return FS_OPERATION_SUCCESS;
+    std::cout << std::endl;
+  }
+
+  if(ffi->flags & O_RDWR) {
+    std::cout << "O_RDWR ";
+  }
+  if(ffi->flags & O_APPEND) {
+    std::cout << "O_APPEND ";
+  }
+  std::cout << std::endl;
+
+  return FS_OPERATION_SUCCESS;
+};
+
 int Operations::read(const char*, char*, size_t, off_t, fuse_file_info*) U;
-int Operations::write(const char*, const char*, size_t, off_t, fuse_file_info*) U;
+
+int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U;
+
 int Operations::statfs(const char*, struct statvfs*) U;
 int Operations::flush(const char*, fuse_file_info*) U;
 int Operations::release(const char*, fuse_file_info*) U;
 int Operations::fsync(const char*, int, fuse_file_info*) U;
+
+#ifdef HAVE_SETXATTR
 int Operations::setxattr(const char*, const char*, const char*, size_t, int) U;
-int Operations::getxattr(const char*, const char*, char*, size_t) U;
+int Operations::getxattr(const char* path, const char* name, char* value, size_t size) U;
 int Operations::listxattr(const char*, char*, size_t) U;
 int Operations::removexattr(const char*, const char*) U;
+#endif
 
 int Operations::opendir(const char* path, fuse_file_info*) {
   std::cout << "opendir path=" << path << std::endl;
@@ -103,7 +157,8 @@ void* Operations::init(fuse_conn_info*, fuse_config* fg) {
   std::cout << "fs init call" << std::endl;
 
   std::cout << "nullpath_ok set to true" << std::endl;
-  fg->nullpath_ok = true;
+  fg->nullpath_ok = mongo_fuse_fs_config.nullpath_ok;
+  fg->use_ino = mongo_fuse_fs_config.use_ino;
 
   mongo::Manager::init_db();
 
@@ -118,14 +173,47 @@ int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U;
 
 int Operations::utimens(const char* path, const timespec*, fuse_file_info*) {
   std::cout << "utimens call" << path << std::endl;
-  errno = ENOENT;
-  return -1;
+  return FS_OPERATION_SUCCESS;
 }
 
 int Operations::bmap(const char*, size_t, uint64_t*) U;
 int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigned int, void*) U;
 int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U;
-int Operations::write_buf(const char*, fuse_bufvec*, off_t, fuse_file_info*) U;
+
+int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
+  if(!ffi) {
+    std::cout << "write_buf called with path: " << path << std::endl;
+  } else {
+    std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
+  }
+
+  // FIXME: bad string output. maybe build up string?
+  std::cout << "file write_buf with the following flags: ";
+
+  // exclusive file flags
+  if(ffi->flags & O_RDONLY) {
+    std::cout << std::endl;
+    return FS_OPERATION_SUCCESS;
+  }
+  if(ffi->flags & O_WRONLY) {
+    std::cout << "O_WRONLY ";
+    return FS_OPERATION_SUCCESS;
+    std::cout << std::endl;
+  }
+
+  if(ffi->flags & O_RDWR) {
+    std::cout << "O_RDWR ";
+  }
+  if(ffi->flags & O_APPEND) {
+    std::cout << "O_APPEND ";
+  }
+  std::cout << std::endl;
+
+  std::cout << "fd: " << f_bvec->buf->fd << " bytes at offset: " << buf_offset << std::endl;
+
+  return FS_OPERATION_SUCCESS;
+};
+
 int Operations::read_buf(const char*, fuse_bufvec**, size_t, off_t, fuse_file_info*) U;
 int Operations::flock(const char*, fuse_file_info*, int) U;
 int Operations::fallocate(const char*, int, off_t, off_t, fuse_file_info*) U;

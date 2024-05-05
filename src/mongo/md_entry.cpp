@@ -43,6 +43,9 @@ MDEntry::MDEntry(const char* _path, mode_t _mode, MDFileType file_type) {
   // NOTE: uid/gid unable to be converted to proper type for mongodb
   uid = (int)fuse_context->uid;
   gid = (int)fuse_context->gid;
+
+  std::cout << "md uid: " << uid << std::endl;
+  std::cout << "md gid: " << gid << std::endl;
 }
 
 const INODE MDEntry::create_entry() {
@@ -67,7 +70,7 @@ const INODE MDEntry::create_entry() {
       kvp(GROUP_PERM_EXEC_KEY, mode.user_perm.exec),
 
       // univ perms
-      kvp(UNIV_PERM_EXEC_KEY, mode.user_perm.read),
+      kvp(UNIV_PERM_READ_KEY, mode.user_perm.read),
       kvp(UNIV_PERM_WRITE_KEY, mode.user_perm.write),
       kvp(UNIV_PERM_EXEC_KEY, mode.user_perm.exec),
 
@@ -77,8 +80,8 @@ const INODE MDEntry::create_entry() {
       kvp(LAST_CHANGE_KEY, last_change),
 
       // set id's
-      kvp(UID_KEY, uid),
-      kvp(GID_KEY, gid)
+      kvp(UID_KEY, (int)uid),
+      kvp(GID_KEY, (int)gid)
   ));
   
   assert(root_dir_doc);
@@ -95,6 +98,8 @@ std::optional< MDEntry> MDEntry::search_by_fd(INODE fd) {
     std::cout << "md entry not found fd: " << fd << std::endl;
 
     return std::nullopt;
+  } else {
+    std::cout << "doc found with fd: " << fd << std::endl;
   }
 
   return bson_to_md_entry(doc.value());
@@ -109,16 +114,39 @@ std::optional<MDEntry> MDEntry::search_by_path(std::string path) {
     std::cout << "md entry not found path: " << path << std::endl;
 
     return std::nullopt;
+  } else {
+    std::cout << "doc found with path: " << path << std::endl;
   }
 
   return bson_to_md_entry(doc.value());
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html
 const mode_t MDEntry::to_mode_t() {
   mode_t res = 0;
+
+  // user bits
+  if(mode.user_perm.read) { res = res | S_IRUSR; }
+  if(mode.user_perm.write) { res = res | S_IWUSR; }
+  if(mode.user_perm.exec) { res = res | S_IXUSR; }
+
+  // group bits
+  if(mode.group_perm.read) { res = res | S_IRGRP; }
+  if(mode.group_perm.write) { res = res | S_IWGRP; }
+  if(mode.group_perm.exec) { res = res | S_IXGRP; }
+
+  // univ bits
+  if(mode.univ_perm.read) { res = res | S_IROTH; }
+  if(mode.univ_perm.write) { res = res | S_IWOTH; }
+  if(mode.univ_perm.exec) { res = res | S_IXOTH; }
+
+  if(md_type == MD_FS_FILE_MD_TYPE) { return S_IFREG | res; }
+
+  return S_IFDIR | res;
 }
 
 MDEntry MDEntry::bson_to_md_entry(value bson_doc) {
+  std::cout << "getting bson mode values" << std::endl;
   fs::Mode mode(
   fs::Perm{bson_doc[USER_PERM_READ_KEY].get_bool().value, 
            bson_doc[USER_PERM_WRITE_KEY].get_bool().value, 
@@ -132,14 +160,20 @@ MDEntry MDEntry::bson_to_md_entry(value bson_doc) {
            bson_doc[UNIV_PERM_EXEC_KEY].get_bool().value}
   );
 
+  std::cout << "getting timestamps" << std::endl;
+  time_t last_access = bson_doc[LAST_ACCESS_KEY].get_int64().value;
+  time_t last_modify = bson_doc[LAST_MODIFY_KEY].get_int64().value;
+  time_t last_change = bson_doc[LAST_CHANGE_KEY].get_int64().value;
+
+  std::cout << "getting other mode values" << std::endl;
   return MDEntry(
     bson_doc[INODE_KEY].get_int64().value, 
     std::string(bson_doc[MD_DOC_PATH_KEY].get_string().value), 
-    std::string(bson_doc[MD_FS_DIR_MD_TYPE].get_string().value),
+    std::string(bson_doc[MD_TYPE_KEY].get_string().value),
     mode,
-    bson_doc[LAST_ACCESS_KEY].get_timestamp().timestamp,
-    bson_doc[LAST_MODIFY_KEY].get_timestamp().timestamp,
-    bson_doc[LAST_CHANGE_KEY].get_timestamp().timestamp,
-    bson_doc[UID_KEY].get_int64().value,
-    bson_doc[GID_KEY].get_int64().value);
+    time(&last_access),
+    time(&last_modify),
+    time(&last_change),
+    bson_doc[UID_KEY].get_int32().value,
+    bson_doc[GID_KEY].get_int32().value);
 }

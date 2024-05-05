@@ -12,6 +12,7 @@
 #define MD_ROOT_DIR_DOC_PATH_VALUE "/"
 // specifies whether metadata entries is a file or dir
 #define MD_TYPE_KEY "type"
+// FIXME: awful names here
 #define MD_FS_DIR_MD_TYPE "dir"
 #define MD_FS_FILE_MD_TYPE "file"
 
@@ -21,7 +22,7 @@
 // specifies permission bits inside metadata entries
 #define USER_PERM_PREFIX_KEY "user_"
 #define GROUP_PERM_PREFIX_KEY "group_"
-#define UNIV_PERM_PREFIX_KEY "group_"
+#define UNIV_PERM_PREFIX_KEY "univ_"
 
 // user perms
 #define USER_PERM_READ_KEY USER_PERM_PREFIX_KEY "read"
@@ -42,7 +43,7 @@
 #define UID_KEY "uid"
 #define GID_KEY "gid"
 
-typedef uint64_t INODE;
+typedef int INODE;
 
 using bsoncxx::v_noabi::document::value;
 
@@ -67,7 +68,6 @@ namespace mongo {
             static std::optional<MDEntry> search_by_path(std::string path);
             static MDEntry bson_to_md_entry(value bson_doc);
 
-        private:
             long fd;
             std::string path;
             std::string md_type;
