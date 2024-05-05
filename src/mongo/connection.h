@@ -7,6 +7,7 @@
 
 #define DB_URI "mongodb://localhost:27017"
 
+#define ROOT_DB_NAME "fs_root"
 #define GET_ROOT_DB(conn) (conn)->get_client()[ROOT_DB_NAME] 
 #define GET_MD_COLLECTION(conn) GET_ROOT_DB(conn)[MD_COLLECTION_NAME]
 #define GET_FILE_COLLECTION(conn) GET_ROOT_DB(conn)[FILE_COLLECTION_NAME]

@@ -3,6 +3,7 @@
 #include <fuse.h>
 #include <iostream>
 #include <assert.h>
+#include <random>
 #include <bsoncxx/builder/stream/helpers.hpp>
 
 #include "manager.h"
@@ -17,4 +18,12 @@ using namespace mongo;
 
 void Manager::init_db() {
   std::cout << "init database" << std::endl;
+}
+
+int Manager::generate_id() {
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  std::uniform_int_distribution<int> dis;
+  
+  return dis(gen);
 }

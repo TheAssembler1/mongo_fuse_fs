@@ -2,11 +2,13 @@
 #include <memory.h>
 #include <stddef.h>
 #include <fcntl.h>
+#include <cassert>
 
 #include "handler.h"
 #include "../mongo/manager.h"
 #include "../mongo/connection.h"
 #include "../mongo/md_entry.h"
+#include "../mongo/fs_entry.h"
 
 #define FS_OPERATION_FAIL 1
 #define FS_OPERATION_SUCCESS 0
@@ -181,35 +183,31 @@ int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigne
 int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U;
 
 int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
-  if(!ffi) {
-    std::cout << "write_buf called with path: " << path << std::endl;
-  } else {
-    std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
-  }
+  std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
+  std::cout << "number of buffers: " << f_bvec->count << std::endl;
+  std::cout << "write_buf offset: " << f_bvec->off << std::endl;
 
-  // FIXME: bad string output. maybe build up string?
-  std::cout << "file write_buf with the following flags: ";
+  for(int i = 0; i < f_bvec->count; i++) {
+    auto f_b = f_bvec->buf[i];
 
-  // exclusive file flags
-  if(ffi->flags & O_RDONLY) {
-    std::cout << std::endl;
-    return FS_OPERATION_SUCCESS;
-  }
-  if(ffi->flags & O_WRONLY) {
-    std::cout << "O_WRONLY ";
-    return FS_OPERATION_SUCCESS;
-    std::cout << std::endl;
-  }
+    assert(ffi->fh != 0);
 
-  if(ffi->flags & O_RDWR) {
-    std::cout << "O_RDWR ";
-  }
-  if(ffi->flags & O_APPEND) {
-    std::cout << "O_APPEND ";
-  }
-  std::cout << std::endl;
+    std::cout << "write_buf called with fd: " << (int)ffi->fh << std::endl;
+    auto md_entry_opt = mongo::MDEntry::search_by_fd(ffi->fh);
 
-  std::cout << "fd: " << f_bvec->buf->fd << " bytes at offset: " << buf_offset << std::endl;
+    if(!md_entry_opt.has_value()) {
+      std::cerr << "md entry has no value in write_buf" << std::endl;
+    }
+
+    auto md_entry = md_entry_opt.value();
+    mongo::FSEntry fs_entry = mongo::FSEntry{md_entry, f_b.pos, f_b.size, (char*)f_b.mem};
+    std::optional<int> bytes_written_opt = fs_entry.create_entry();
+
+    if(!bytes_written_opt.has_value() != f_b.size) {
+      std::cerr << "bytes written != to buffer size" << std::endl;
+      std::cerr << "bytes written: " << bytes_written_opt.value() << std::endl;
+    }
+  }
 
   return FS_OPERATION_SUCCESS;
 };

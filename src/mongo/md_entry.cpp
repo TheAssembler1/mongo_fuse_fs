@@ -24,10 +24,7 @@ using namespace mongo;
 MDEntry::MDEntry(const char* _path, mode_t _mode, MDFileType file_type) {
   std::cout << "creating file md for " << path << std::endl;
 
-  std::random_device rd;
-  std::mt19937_64 gen(rd());
-  std::uniform_int_distribution<long> dis;
-  fd = dis(gen);
+  fd = Manager::generate_id();
   std::cout << "generated random fd " << fd << std::endl;
 
   path = std::string(_path);
@@ -92,6 +89,7 @@ const INODE MDEntry::create_entry() {
 std::optional< MDEntry> MDEntry::search_by_fd(INODE fd) {
   Connection conn;
   auto md_collection = GET_MD_COLLECTION(&conn);
+  std::cout << "attempting search for fd: " << fd << std::endl;
   auto doc = md_collection.find_one(make_document(kvp(INODE_KEY, fd)));
 
   if(!doc.has_value()) {

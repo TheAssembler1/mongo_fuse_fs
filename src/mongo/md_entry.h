@@ -3,6 +3,14 @@
 #include "../fs/perm.h"
 
 #include <iostream>
+#include <mongocxx/client.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/instance.hpp>
+#include <algorithm>
+#include <iostream>
+#include <vector>
 
 // NOTE: for metadata entries =================================
 // holds entries to metadata 

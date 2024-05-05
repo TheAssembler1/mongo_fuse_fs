@@ -26,6 +26,7 @@ set(SOURCES
     src/fs/perm.cpp
     src/mongo/manager.cpp
     src/mongo/md_entry.cpp
+    src/mongo/fs_entry.cpp
 )
 
 # Create executable

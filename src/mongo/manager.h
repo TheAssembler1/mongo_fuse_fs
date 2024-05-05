@@ -23,6 +23,7 @@ namespace mongo {
   class Manager {
     public:
       static void init_db();
+      static int generate_id();
 
       static inline uint64_t cur_max_fd = 0;
       static const inline mongocxx::instance inst;
