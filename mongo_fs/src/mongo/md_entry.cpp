@@ -15,6 +15,7 @@
 #include "manager.h"
 #include "connection.h"
 #include "md_entry.h"
+#include "fs_lookup.h"
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
@@ -144,7 +145,7 @@ const mode_t MDEntry::to_mode_t() {
 }
 
 MDEntry MDEntry::bson_to_md_entry(value bson_doc) {
-  std::cout << "getting bson mode values" << std::endl;
+  std::cout << "getting bson permission values" << std::endl;
   fs::Mode mode(
   fs::Perm{bson_doc[USER_PERM_READ_KEY].get_bool().value, 
            bson_doc[USER_PERM_WRITE_KEY].get_bool().value, 
@@ -158,20 +159,45 @@ MDEntry MDEntry::bson_to_md_entry(value bson_doc) {
            bson_doc[UNIV_PERM_EXEC_KEY].get_bool().value}
   );
 
-  std::cout << "getting timestamps" << std::endl;
+  std::cout << "getting bson timestamps values" << std::endl;
   time_t last_access = bson_doc[LAST_ACCESS_KEY].get_int64().value;
   time_t last_modify = bson_doc[LAST_MODIFY_KEY].get_int64().value;
   time_t last_change = bson_doc[LAST_CHANGE_KEY].get_int64().value;
+  
+  std::cout << "getting inode value" << std::endl;
+  INODE fd = bson_doc[INODE_KEY].get_int32().value;
+  
+  std::cout << "getting uid value" << std::endl; 
+  int uid = bson_doc[UID_KEY].get_int32().value;
+
+  std::cout << "getting gid value" << std::endl;
+  int gid = bson_doc[GID_KEY].get_int32().value;
 
   std::cout << "getting other mode values" << std::endl;
   return MDEntry(
-    bson_doc[INODE_KEY].get_int64().value, 
+    fd, 
     std::string(bson_doc[MD_DOC_PATH_KEY].get_string().value), 
     std::string(bson_doc[MD_TYPE_KEY].get_string().value),
     mode,
     time(&last_access),
     time(&last_modify),
     time(&last_change),
-    bson_doc[UID_KEY].get_int32().value,
-    bson_doc[GID_KEY].get_int32().value);
+    uid,
+    gid
+  );
+}
+
+void MDEntry::read_all_data_blocks(char** _buf) {
+  FSLookup fs_lookup(fd); 
+  std::vector<FS_ID> fs_ids = fs_lookup.get_ordered_fs_ids();
+  
+  // FIXME : assumes only has one block
+  for(auto fs_id: fs_ids) {
+    std::optional<char*> buf_opt = FSEntry::read_entry_data(fs_id);
+
+    assert(buf_opt.has_value());
+    char* buf = buf_opt.value();
+      
+    *_buf = buf;
+  }
 }

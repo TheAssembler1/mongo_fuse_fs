@@ -8,15 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXTERNAL_LIBS
-  "${CMAKE_SOURCE_DIR}/external/fuse3/install/lib/x86_64-linux-gnu/libfuse3.so"
-  "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/lib/libmongocxx.so"
-  "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/lib/libbsoncxx.so"
+  "${CMAKE_SOURCE_DIR}/../external/fuse3/install/lib/x86_64-linux-gnu/libfuse3.so"
+  "${CMAKE_SOURCE_DIR}/../external/mongo-cxx-driver-r3.10.1/install/lib/libmongocxx.so"
+  "${CMAKE_SOURCE_DIR}/../external/mongo-cxx-driver-r3.10.1/install/lib/libbsoncxx.so"
 )
 
 set(EXTERNAL_HEADERS 
-  "${CMAKE_SOURCE_DIR}/external/fuse3/install/include/fuse3"
-  "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi"
-  "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi"
+  "${CMAKE_SOURCE_DIR}/../external/fuse3/install/include/fuse3"
+  "${CMAKE_SOURCE_DIR}/../external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi"
+  "${CMAKE_SOURCE_DIR}/../external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi"
 )
 
 # Add your source files
@@ -27,6 +27,7 @@ set(SOURCES
     src/mongo/manager.cpp
     src/mongo/md_entry.cpp
     src/mongo/fs_entry.cpp
+    src/mongo/fs_lookup.cpp
 )
 
 # Create executable

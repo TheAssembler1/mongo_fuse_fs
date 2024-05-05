@@ -64,20 +64,22 @@ namespace mongo {
 
     class MDEntry {
         public:
-            MDEntry(long fd, std::string path, std::string md_type, fs::Mode mode, time_t last_access, 
-                    time_t last_modify, time_t last_change, int uide, int gid) 
+            MDEntry(INODE fd, std::string path, std::string md_type, fs::Mode mode, time_t last_access, 
+                    time_t last_modify, time_t last_change, int uid, int gid) 
                     : fd{fd}, path{path}, md_type{md_type}, mode{mode}, last_access{last_access},
                       last_modify{last_modify}, last_change{last_change}, uid{uid}, gid{gid} {}
             MDEntry(const char* _path, mode_t _mode, MDFileType file_type);
             const INODE create_entry();
             const mode_t to_mode_t();
+            void read_all_data_blocks(char** buf);
 
             static std::optional<MDEntry> search_by_fd(INODE fd);
             static std::optional<MDEntry> search_by_path(std::string path);
             static MDEntry bson_to_md_entry(value bson_doc);
 
-            long fd;
+            INODE fd;
             std::string path;
+            // FIXME: maybe conver to enum class on read
             std::string md_type;
             fs::Mode mode;
             time_t last_access;

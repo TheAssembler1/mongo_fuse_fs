@@ -11,6 +11,7 @@
 #define GET_ROOT_DB(conn) (conn)->get_client()[ROOT_DB_NAME] 
 #define GET_MD_COLLECTION(conn) GET_ROOT_DB(conn)[MD_COLLECTION_NAME]
 #define GET_FILE_COLLECTION(conn) GET_ROOT_DB(conn)[FILE_COLLECTION_NAME]
+#define GET_FS_BLOCKS_COLLECTION(conn) GET_ROOT_DB(conn)[FS_BLOCKS_COLLECTION_NAME]
 
 namespace mongo {
 

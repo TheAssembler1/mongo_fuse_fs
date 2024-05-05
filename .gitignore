@@ -5,3 +5,4 @@ mnt_pt
 *.log
 mnt
 .vscode
+build_mongo_fuse_fs

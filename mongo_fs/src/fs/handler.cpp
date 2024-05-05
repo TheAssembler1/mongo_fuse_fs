@@ -126,7 +126,25 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
   return FS_OPERATION_SUCCESS;
 };
 
-int Operations::read(const char*, char*, size_t, off_t, fuse_file_info*) U;
+int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) {
+  std::cout << "read called with fd: " << ffi->fh << std::endl;
+
+  std::optional<mongo::MDEntry> md_entry_opt =  mongo::MDEntry::search_by_fd(ffi->fh);
+
+  if(!md_entry_opt.has_value()) {
+    return -EBADF;
+  }
+
+  mongo::MDEntry md_entry = md_entry_opt.value();
+
+  if(md_entry.md_type == MD_FS_DIR_MD_TYPE) {
+   return -EISDIR;  
+  }
+  
+  md_entry.read_all_data_blocks(&ret_buf);
+
+  return size;
+}
 
 int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U;
 

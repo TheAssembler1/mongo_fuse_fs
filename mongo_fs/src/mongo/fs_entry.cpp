@@ -1,11 +1,14 @@
-#include "fs_entry.h"
-#include "connection.h"
-#include "manager.h"
 #include <mongocxx/client.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <vector>
 #include <cassert>
+#include <optional>
+
+#include "fs_entry.h"
+#include "fs_lookup.h"
+#include "connection.h"
+#include "manager.h"
 
 using namespace mongo;
 
@@ -32,12 +35,35 @@ std::optional<int> FSEntry::create_entry() {
 
   assert(result_doc);
 
-  auto query = file_collection.find_one(make_document(
-    kvp(FS_ID_KEY, fs_id)
-  ));
-  
-  const char* binary = (const char*)query.value()[FS_BIN_KEY].get_binary().bytes;
-  std::cout << "output binary: " << binary << std::endl;
+  if(!result_doc.has_value()) {
+    return std::nullopt;
+  }
 
-  return 123;
+  FSLookup fs_lookup{md_entry.fd};
+  auto res = fs_lookup.create_entry(fs_id); 
+
+  if(res.has_value()) {
+    std::cout << "create fs lookup entry with fs_id: " << res.value() << std::endl;
+  } else {
+    std::cout << "failed to create fs lookup entry" << std::endl; 
+  }
+
+  return size;
+}
+
+std::optional<char*> FSEntry::read_entry_data(FS_ID fs_id) {
+  Connection conn;
+  auto file_collection = GET_FILE_COLLECTION(&conn);
+
+  auto bson_res = file_collection.find_one(make_document(kvp(FS_ID_KEY, fs_id)));
+
+  assert(bson_res);
+
+  if(!bson_res.has_value()) {
+    return std::nullopt;
+  }
+
+  char* buf = (char*)bson_res.value()[FS_BIN_KEY].get_binary().bytes;
+
+  return buf;
 }
