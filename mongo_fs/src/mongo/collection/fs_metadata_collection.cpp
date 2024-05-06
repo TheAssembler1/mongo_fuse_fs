@@ -1,20 +1,4 @@
-// NOTE: needed to establish fuse version early
-#define FUSE_USE_VERSION 35
-#include <fuse.h>
-#include <cassert>
-#include <random>
-#include <iostream>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <algorithm>
-#include <iostream>
-#include <vector>
-
-
 #include "fs_metadata_collection.h"
-#include "../manager.h"
-#include "../connection.h"
-#include "fs_lookup_collection.h"
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::document::view_or_value;
@@ -84,10 +68,10 @@ INODE FSMetadataCollection::create_entry(FSMetadataCollectionEntry fs_metadata_c
   return fs_metadata_collection_entry.inode;
 }
 
-std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_fd(INODE fd) {
+std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_inode(INODE inode) {
   Connection conn;
   auto md_collection = GET_FS_METADATA_COLLECTION(&conn);
-  auto doc = md_collection.find_one(make_document(kvp(INODE_KEY, fd)));
+  auto doc = md_collection.find_one(make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, inode)));
 
   if(!doc.has_value()) {
     return std::nullopt;
@@ -166,19 +150,4 @@ FSMetadataCollectionEntry FSMetadataCollectionEntry::bson_to_md_entry(value bson
     uid,
     gid
   );
-}
-
-void FSMetadataCollectionEntry::read_all_data_blocks(char** _buf) {
-  FSLookupCollection fs_lookup(inode); 
-  std::vector<FS_ID> fs_ids = fs_lookup.get_ordered_fs_ids();
-  
-  // FIXME : assumes only has one block
-  for(auto fs_id: fs_ids) {
-    std::optional<char*> buf_opt = FSDataCollection::read_entry_data(fs_id);
-
-    assert(buf_opt.has_value());
-    char* buf = buf_opt.value();
-      
-    *_buf = buf;
-  }
 }

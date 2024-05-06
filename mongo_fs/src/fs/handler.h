@@ -1,9 +1,10 @@
 #pragma once
 
-// NOTE: needed to establish fuse version early
-#define FUSE_USE_VERSION 35
-#define HAVE_SETXATTR 1
-#include <fuse.h>
+#include <iostream>
+
+#include "../mongo/collection/fs_lookup_collection.h"
+#include "../mongo/collection/fs_data_collection.h"
+#include "../mongo/collection/fs_metadata_collection.h"
 
 namespace fs {
   

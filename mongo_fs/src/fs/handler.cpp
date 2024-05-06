@@ -1,14 +1,4 @@
-#include <iostream>
-#include <memory.h>
-#include <stddef.h>
-#include <fcntl.h>
-#include <cassert>
-
 #include "handler.h"
-#include "../mongo/manager.h"
-#include "../mongo/connection.h"
-#include "../mongo/collection/fs_metadata_collection.h"
-#include "../mongo/collection/fs_data_collection.h"
 
 #define FS_OPERATION_FAIL 1
 #define FS_OPERATION_SUCCESS 0
@@ -53,7 +43,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     md_entry_opt = mongo::FSMetadataCollection::search_by_path(path);
   } else {
     std::cout << "ffi not null searching by fd: " << ffi->fh << std::endl;
-    md_entry_opt = mongo::FSMetadataCollection::search_by_fd(ffi->fh);
+    md_entry_opt = mongo::FSMetadataCollection::search_by_inode(ffi->fh);
   }
 
   if(md_entry_opt.has_value()) {
@@ -129,7 +119,7 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
 int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) {
   std::cout << "read called with fd: " << ffi->fh << std::endl;
 
-  std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt =  mongo::FSMetadataCollection::search_by_fd(ffi->fh);
+  std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt =  mongo::FSMetadataCollection::search_by_inode(ffi->fh);
 
   if(!md_entry_opt.has_value()) {
     return -EBADF;
@@ -140,8 +130,8 @@ int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset,
   if(md_entry.file_type == mongo::FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE) {
    return -EISDIR;  
   }
-  
-  md_entry.read_all_data_blocks(&ret_buf);
+
+  std::vector<mongo::FSDataCollectionEntry> fs_data_collection_entires = mongo::FSDataCollection::read_all_fs_data_blocks(ffi->fh);
 
   return size;
 }
@@ -211,15 +201,15 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offse
     assert(ffi->fh != 0);
 
     std::cout << "write_buf called with fd: " << (int)ffi->fh << std::endl;
-    auto md_entry_opt = mongo::FSMetadataCollection::search_by_fd(ffi->fh);
+    auto md_entry_opt = mongo::FSMetadataCollection::search_by_inode(ffi->fh);
 
     if(!md_entry_opt.has_value()) {
       std::cerr << "md entry has no value in write_buf" << std::endl;
     }
 
     auto md_entry = md_entry_opt.value();
-    mongo::FSDataCollection fs_entry = mongo::FSDataCollection{md_entry, f_b.pos, f_b.size, (char*)f_b.mem};
-    std::optional<int> bytes_written_opt = fs_entry.create_entry();
+    mongo::FSDataCollectionEntry fs_data_entry = mongo::FSDataCollectionEntry{(long int)f_b.size, (char*)f_b.mem};
+    std::optional<int> bytes_written_opt = mongo::FSDataCollection::create_entry(ffi->fh, fs_data_entry);
 
     if(!bytes_written_opt.has_value() != f_b.size) {
       std::cerr << "bytes written != to buffer size" << std::endl;

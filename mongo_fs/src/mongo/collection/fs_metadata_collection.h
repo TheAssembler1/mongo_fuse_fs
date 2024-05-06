@@ -1,18 +1,22 @@
 #pragma once
 
-#include "../../fs/perm.h"
-
+// NOTE: needed to establish fuse version early
+#define FUSE_USE_VERSION 35
+#include <fuse.h>
+#include <cassert>
+#include <random>
 #include <iostream>
-#include <mongocxx/client.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
 #include <mongocxx/uri.hpp>
 #include <mongocxx/instance.hpp>
 #include <algorithm>
 #include <iostream>
 #include <vector>
 
-typedef int INODE;
+#include "../../fs/perm.h"
+#include "../manager.h"
+#include "../connection.h"
+#include "fs_lookup_collection.h"
+#include "fs_data_collection.h"
 
 using bsoncxx::v_noabi::document::value;
 using bsoncxx::v_noabi::document::view;
@@ -32,7 +36,6 @@ namespace mongo {
                         last_modify{last_modify}, last_change{last_change}, uid{uid}, gid{gid} {}
         FSMetadataCollectionEntry(const char* _path, mode_t _mode, MDFileType file_type);
 
-        void read_all_data_blocks(char** buf);
         const mode_t to_mode_t();
         const value to_document(); 
 
@@ -72,9 +75,8 @@ namespace mongo {
     class FSMetadataCollection {
         public:
             static INODE create_entry(FSMetadataCollectionEntry fs_metadata_collection_entry);
-            static std::optional<FSMetadataCollectionEntry> search_by_fd(INODE fd);
+            static std::optional<FSMetadataCollectionEntry> search_by_inode(INODE inode);
             static std::optional<FSMetadataCollectionEntry> search_by_path(std::string path);
-
             static constexpr std::string_view NAME = "fs_metadata";
     };
 
