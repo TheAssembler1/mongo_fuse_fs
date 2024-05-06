@@ -2,12 +2,17 @@
 
 #define FS_OPERATION_FAIL 1
 #define FS_OPERATION_SUCCESS 0
-#define U {std::cerr << "unimplemented method: " << __FUNCTION__ << std::endl; return FS_OPERATION_SUCCESS;}
+
+#define PREHANDLER_PRINT std::cout << "===================================" << std::endl << "executing function: " << __FUNCTION__ << " handler" << std::endl
+#define POSTHANDLER_PRINT std::cout << std::endl << "done executing function: " << __FUNCTION__ << " handler" << std::endl << "===================================" << std::endl
+#define U {PREHANDLER_PRINT; POSTHANDLER_PRINT; return FS_OPERATION_SUCCESS;}
 
 using namespace fs;
 
 int Operations::create(const char *path, mode_t mode, fuse_file_info *ffi) {
-  std::cout << "create path " << path << std::endl;
+  PREHANDLER_PRINT;
+
+  assert(path != NULL);
 
   if(ffi) {
     std::cout << "getattr non_null ffi: " << ffi->fh << std::endl;
@@ -18,10 +23,14 @@ int Operations::create(const char *path, mode_t mode, fuse_file_info *ffi) {
   mongo::FSMetadataCollectionEntry md_entry(path, mode, mongo::MDFileType::FILE);
   mongo::FSMetadataCollection::create_entry(md_entry);
   
+  POSTHANDLER_PRINT;
+
   return FS_OPERATION_SUCCESS;
 }
 
 int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi) {
+  PREHANDLER_PRINT;
+
   memset(stat, 0, sizeof(struct stat));
   std::cout << "getattr path " << path << std::endl;
 
@@ -60,6 +69,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
 
     return FS_OPERATION_SUCCESS;
   }
+  POSTHANDLER_PRINT;
 
   return -ENOENT;
 };
@@ -77,6 +87,8 @@ int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U;
 int Operations::truncate(const char*, off_t, fuse_file_info*) U;
 
 int Operations::open(const char* path, fuse_file_info* ffi) {
+  PREHANDLER_PRINT;
+
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
 
   std::cout << "open called with path: " << path << std::endl;
@@ -112,11 +124,14 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
     std::cout << "O_APPEND ";
   }
   std::cout << std::endl;
+  POSTHANDLER_PRINT;
 
   return FS_OPERATION_SUCCESS;
 };
 
 int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) {
+  PREHANDLER_PRINT;
+
   std::cout << "read called with fd: " << ffi->fh << std::endl;
 
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt =  mongo::FSMetadataCollection::search_by_inode(ffi->fh);
@@ -132,6 +147,7 @@ int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset,
   }
 
   std::vector<mongo::FSDataCollectionEntry> fs_data_collection_entires = mongo::FSDataCollection::read_all_fs_data_blocks(ffi->fh);
+  POSTHANDLER_PRINT;
 
   return size;
 }
@@ -151,12 +167,15 @@ int Operations::removexattr(const char*, const char*) U;
 #endif
 
 int Operations::opendir(const char* path, fuse_file_info*) {
+  PREHANDLER_PRINT;
   std::cout << "opendir path=" << path << std::endl;
-
+  POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
 
 int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) { std::cout << "readdir path=" << path << std::endl;
+  PREHANDLER_PRINT;
+  POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
 
@@ -164,6 +183,8 @@ int Operations::releasedir(const char*, fuse_file_info*) U;
 int Operations::fsyncdir(const char*, int, fuse_file_info*) U;
 
 void* Operations::init(fuse_conn_info*, fuse_config* fg) {
+  PREHANDLER_PRINT;
+
   std::cout << "fs init call" << std::endl;
 
   std::cout << "nullpath_ok set to true" << std::endl;
@@ -172,7 +193,7 @@ void* Operations::init(fuse_conn_info*, fuse_config* fg) {
 
   mongo::Manager::init_db();
 
-
+  POSTHANDLER_PRINT;
   return nullptr;
 }
 
@@ -182,7 +203,8 @@ int Operations::access(const char*, int) U;
 int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U;
 
 int Operations::utimens(const char* path, const timespec*, fuse_file_info*) {
-  std::cout << "utimens call" << path << std::endl;
+  PREHANDLER_PRINT;
+  POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
 
@@ -191,6 +213,8 @@ int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigne
 int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U;
 
 int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
+  PREHANDLER_PRINT;
+
   std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
   std::cout << "number of buffers: " << f_bvec->count << std::endl;
   std::cout << "write_buf offset: " << f_bvec->off << std::endl;
@@ -217,6 +241,7 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offse
     }
   }
 
+  POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 };
 

@@ -26,10 +26,12 @@ set(SOURCES
     src/entry.cpp
     src/fs/handler.cpp
     src/fs/perm.cpp
+    src/fs/helper.cpp
     src/mongo/manager.cpp
     src/mongo/collection/fs_metadata_collection.cpp
     src/mongo/collection/fs_data_collection.cpp
     src/mongo/collection/fs_lookup_collection.cpp
+    src/mongo/collection/fs_dir_collection.cpp
 )
 
 # Create executable

@@ -29,8 +29,8 @@ std::optional<int> FSDataCollection::create_entry(INODE inode, FSDataCollectionE
   }
 
   std::cout << "creating entry for fs_lookup_collection" << std::endl;
-  FSLookupCollection fs_lookup_collection_entry{inode};
-  fs_lookup_collection_entry.create_entry(fs_data_id);
+  FSLookupCollectionEntry fs_lookup_collection_entry{inode, fs_data_id};
+  FSLookupCollection::create_entry(fs_lookup_collection_entry);
 
   return fs_data_collection_entry.size;
 }
@@ -61,8 +61,7 @@ std::optional<FSDataCollectionEntry> FSDataCollection::read_entry(FS_DATA_ID fs_
 
 
 std::vector<FSDataCollectionEntry> FSDataCollection::read_all_fs_data_blocks(INODE inode) {
-  FSLookupCollection fs_lookup(inode); 
-  std::vector<FS_DATA_ID> fs_data_ids = fs_lookup.get_fs_data_ids();
+  std::vector<FS_DATA_ID> fs_data_ids = FSLookupCollection::get_fs_data_ids();
   std::vector<FSDataCollectionEntry> fs_data_entries;
   
   // FIXME : assumes only has one block

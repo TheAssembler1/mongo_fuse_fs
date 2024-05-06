@@ -27,16 +27,22 @@ using bsoncxx::builder::basic::make_document;
 
 namespace mongo {
 
+  class FSLookupCollectionEntry {
+    public:
+      FSLookupCollectionEntry(INODE inode, FS_DATA_ID fs_data_id) : inode{inode}, fs_data_id {fs_data_id} {}
+      
+      std::optional<int> fs_lookup_id;
+      INODE inode;
+      FS_DATA_ID fs_data_id;
+  };
+
   class FSLookupCollection {
     public:
-      FSLookupCollection(INODE inode) : inode{inode} {}
-
-      std::optional<int> get_max_order();
-      std::optional<int> create_entry(FS_DATA_ID fs_data_id);
-      std::vector<FS_DATA_ID> get_fs_data_ids();
+      static std::optional<int> get_max_order();
+      static std::optional<int> create_entry(FSLookupCollectionEntry fs_lookup_collection_entry);
+      static std::vector<FS_DATA_ID> get_fs_data_ids();
 
       static constexpr std::string_view NAME = "fs_lookup";
-      const INODE inode;
   };
 
 }

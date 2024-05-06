@@ -36,10 +36,10 @@ namespace mongo {
 
   class FSDataCollection {
     public:
-      static constexpr std::string_view NAME = "fs_data";
-
       static std::optional<int> create_entry(INODE inode, FSDataCollectionEntry fs_data_collection_entry);
       static std::optional<FSDataCollectionEntry> read_entry(FS_DATA_ID fs_data_id);
       static std::vector<FSDataCollectionEntry> read_all_fs_data_blocks(INODE inode);
+
+      static constexpr std::string_view NAME = "fs_data";
   };
 }

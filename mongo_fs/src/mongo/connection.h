@@ -6,6 +6,7 @@
 #include "collection/fs_metadata_collection.h"
 #include "collection/fs_data_collection.h"
 #include "collection/fs_lookup_collection.h"
+#include "collection/fs_dir_collection.h"
 #include "../fs/perm.h"
 
 #define DB_URI "mongodb://localhost:27017"
@@ -15,6 +16,7 @@
 #define GET_FS_METADATA_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSMetadataCollection::NAME]
 #define GET_FS_LOOKUP_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSLookupCollection::NAME]
 #define GET_FS_DATA_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDataCollection::NAME]
+#define GET_FS_DIR_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDirCollection::NAME]
 
 namespace mongo {
 
