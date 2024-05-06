@@ -10,10 +10,9 @@
 #include <iostream>
 #include <vector>
 
-#include "md_entry.h"
-#include "fs_entry.h"
+#include "fs_metadata_collection.h"
+#include "fs_data_collection.h"
 
-#define FS_BLOCKS_COLLECTION_NAME "fs_lookup"
 // NOTE: this is the fd/inode id
 #define FS_LOOKUP_ID_KEY "_id"
 #define FS_LOOKUP_FILE_ORDER_NUMBER_KEY "order"
@@ -28,13 +27,15 @@ using bsoncxx::builder::basic::make_document;
 
 namespace mongo {
   
-  class FSLookup {
+  class FSLookupCollection {
     public:
-      FSLookup(INODE fd) : fd{fd} {}
+      FSLookupCollection(INODE fd) : fd{fd} {}
+
       std::optional<int> get_max_order();
       std::optional<int> create_entry(FS_ID fs_id);
       std::vector<FS_ID> get_ordered_fs_ids();
-    private:
+
+      static constexpr std::string_view NAME = "fs_lookup";
       const INODE fd;
   };
 

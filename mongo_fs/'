@@ -25,7 +25,9 @@ int Operations::create(const char *path, mode_t mode, fuse_file_info *ffi) {
     std::cout << "getattr null ffi" << std::endl;
   }
   
+  std::cout << "creating md entry" << std::endl;
   mongo::FSMetadataCollectionEntry md_entry(path, mode, mongo::MDFileType::FILE);
+  std::cout << "adding entry to collection" << std::endl;
   mongo::FSMetadataCollection::create_entry(md_entry);
   
   return FS_OPERATION_SUCCESS;
@@ -49,10 +51,10 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
   if (!ffi) {
-    std::cout << "ffi null searching by path: " << path << std::endl;
+    std::cout << "ffi null searching by path" << std::endl;
     md_entry_opt = mongo::FSMetadataCollection::search_by_path(path);
   } else {
-    std::cout << "ffi not null searching by fd: " << ffi->fh << std::endl;
+    std::cout << "ffi null searching by path" << std::endl;
     md_entry_opt = mongo::FSMetadataCollection::search_by_fd(ffi->fh);
   }
 

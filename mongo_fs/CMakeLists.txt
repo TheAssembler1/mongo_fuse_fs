@@ -27,9 +27,9 @@ set(SOURCES
     src/fs/handler.cpp
     src/fs/perm.cpp
     src/mongo/manager.cpp
-    src/mongo/md_entry.cpp
-    src/mongo/fs_entry.cpp
-    src/mongo/fs_lookup.cpp
+    src/mongo/collection/fs_metadata_collection.cpp
+    src/mongo/collection/fs_data_collection.cpp
+    src/mongo/collection/fs_lookup_collection.cpp
 )
 
 # Create executable

@@ -5,10 +5,10 @@
 #include <cassert>
 #include <optional>
 
-#include "fs_entry.h"
-#include "fs_lookup.h"
-#include "connection.h"
-#include "manager.h"
+#include "fs_data_collection.h"
+#include "fs_lookup_collection.h"
+#include "../connection.h"
+#include "../manager.h"
 
 using namespace mongo;
 
@@ -18,10 +18,10 @@ using bsoncxx::binary_sub_type;
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
 
-std::optional<int> FSEntry::create_entry() {
+std::optional<int> FSDataCollection::create_entry() {
   Connection conn;
-  auto file_collection = GET_FILE_COLLECTION(&conn);
-  std::cout << "writing to fd: " << md_entry.fd << std::endl;
+  auto file_collection = GET_FS_DATA_COLLECTION(&conn);
+  std::cout << "writing to fd: " << md_entry.inode << std::endl;
 
   std::streamsize stream_size = size;
   b_binary data{binary_sub_type::k_binary, static_cast<std::uint32_t>(stream_size), reinterpret_cast<const std::uint8_t*>(buf)};
@@ -39,7 +39,7 @@ std::optional<int> FSEntry::create_entry() {
     return std::nullopt;
   }
 
-  FSLookup fs_lookup{md_entry.fd};
+  FSLookupCollection fs_lookup{md_entry.inode};
   auto res = fs_lookup.create_entry(fs_id); 
 
   if(res.has_value()) {
@@ -51,9 +51,9 @@ std::optional<int> FSEntry::create_entry() {
   return size;
 }
 
-std::optional<char*> FSEntry::read_entry_data(FS_ID fs_id) {
+std::optional<char*> FSDataCollection::read_entry_data(FS_ID fs_id) {
   Connection conn;
-  auto file_collection = GET_FILE_COLLECTION(&conn);
+  auto file_collection = GET_FS_DATA_COLLECTION(&conn);
 
   auto bson_res = file_collection.find_one(make_document(kvp(FS_ID_KEY, fs_id)));
 

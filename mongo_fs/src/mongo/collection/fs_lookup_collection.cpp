@@ -1,17 +1,17 @@
 #include <cassert>
 
-#include "fs_lookup.h"
-#include "connection.h"
+#include "fs_lookup_collection.h"
+#include "../connection.h"
 
 using namespace mongo;
 
 #define MONGO_ASC_ORDER 1
 #define MONGO_DESC_ORDER -1
 
-std::optional<int> FSLookup::get_max_order() {
+std::optional<int> FSLookupCollection::get_max_order() {
   Connection conn; 
 
-  auto fs_blocks_collection = GET_FS_BLOCKS_COLLECTION(&conn);
+  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
 
   auto query_pipeline = mongocxx::pipeline();
   query_pipeline.sort(make_document(kvp(FS_ID_KEY, MONGO_DESC_ORDER)));
@@ -27,9 +27,9 @@ std::optional<int> FSLookup::get_max_order() {
   return prev_max_fs_lookup_block[FS_ID_KEY].get_int64() + 1; 
 }
 
-std::optional<int> FSLookup::create_entry(FS_ID fs_id) {
+std::optional<int> FSLookupCollection::create_entry(FS_ID fs_id) {
   Connection conn; 
-  auto fs_blocks_collection = GET_FS_BLOCKS_COLLECTION(&conn);
+  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
   auto last_order = get_max_order();
 
   FS_ID cur_order = 0;
@@ -52,10 +52,10 @@ std::optional<int> FSLookup::create_entry(FS_ID fs_id) {
   return fd;
 }
 
-std::vector<FS_ID> FSLookup::get_ordered_fs_ids() {
+std::vector<FS_ID> FSLookupCollection::get_ordered_fs_ids() {
   Connection conn; 
 
-  auto fs_blocks_collection = GET_FS_BLOCKS_COLLECTION(&conn);
+  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
 
   auto query_pipeline = mongocxx::pipeline();
   query_pipeline.sort(make_document(kvp(FS_ID_KEY, MONGO_ASC_ORDER)));
