@@ -11,15 +11,19 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/uri.hpp>
 #include <sys/stat.h>
+#include <time.h>
 
+#include "collection/fs_metadata_collection.h"
 #include "connection.h"
 #include "../fs/perm.h"
+#include "../fs/helper.h"
 
 // NOTE: for database =========================================
 // the name of the database used to store all fs data
 #define ROOT_DB_NAME "fs_root"
-
 #define BLOCK_SIZE 512
+// FIXME: put somewhere better?
+#define MAX_FS_ROOT_PATH 256
 
 namespace mongo {
 
@@ -29,6 +33,7 @@ namespace mongo {
       static int generate_id();
 
       static inline uint64_t cur_max_fd = 0;
+      static inline std::string fs_root_path = std::string{};
       static const inline mongocxx::instance inst;
   };
 

@@ -13,15 +13,16 @@ const value FSDirCollectionEntry::to_document() {
 FSDirCollectionEntry FSDirCollectionEntry::bson_to_dir_collection_entry(view bson_doc) {
   return FSDirCollectionEntry {
     bson_doc[DIR_INODE_KEY].get_int32().value,
+    bson_doc[PARENT_DIR_INODE_KEY].get_int32().value,
     bson_doc[FILE_INODE_KEY].get_int32().value
   };
 }
 
-std::optional<INODE> FSDirCollection::create_entry(INODE dir_inode, INODE file_inode) {
+std::optional<INODE> FSDirCollection::create_entry(INODE dir_inode, INODE parent_dir_inode, INODE file_inode) {
   Connection conn;
   auto fs_dir_collection = GET_FS_DIR_COLLECTION(&conn);
 
-  FSDirCollectionEntry fs_dir_collection_entry{dir_inode, file_inode};
+  FSDirCollectionEntry fs_dir_collection_entry{dir_inode, parent_dir_inode, file_inode};
   auto doc_res_bson = fs_dir_collection.insert_one(fs_dir_collection_entry.to_document().view());
   assert(doc_res_bson);
 

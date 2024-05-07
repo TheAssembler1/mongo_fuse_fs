@@ -13,9 +13,15 @@
 
 #define ROOT_DB_NAME "fs_root"
 #define GET_ROOT_DB(conn) (conn)->get_client()[ROOT_DB_NAME] 
+// NOTE: holds metadata for all files and folders 
+// info such as inode, permission, timestamps, etc.
 #define GET_FS_METADATA_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSMetadataCollection::NAME]
+// NOTE: maps file inodes unto data blocks which can 
+// then be queried from fs_data collection
 #define GET_FS_LOOKUP_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSLookupCollection::NAME]
+// NOTE: holds all data blocks for files in fs
 #define GET_FS_DATA_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDataCollection::NAME]
+// NOTE: maps dir inodes to file/dir inodes
 #define GET_FS_DIR_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDirCollection::NAME]
 
 namespace mongo {

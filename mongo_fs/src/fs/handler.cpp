@@ -41,9 +41,9 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   }
 
   if(strcmp(path, "/") == 0) {
-    stat->st_mode = S_IFDIR | 0755;
-    stat->st_nlink = 0;
-    return -ENOENT;
+    struct stat root_fs_dir_stat = Helper::get_stat_of_root_fs();
+    memcpy(stat, &root_fs_dir_stat, sizeof(struct stat)); 
+    return FS_OPERATION_SUCCESS;
   }
   
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;

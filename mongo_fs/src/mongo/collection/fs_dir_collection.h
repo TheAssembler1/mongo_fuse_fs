@@ -26,21 +26,23 @@ namespace mongo {
 
   class FSDirCollectionEntry {
     public:
-      FSDirCollectionEntry(INODE dir_inode, INODE file_inode) : dir_inode{dir_inode}, file_inode{file_inode} {}
+      FSDirCollectionEntry(INODE dir_inode, INODE parent_dir_inode, INODE file_inode) : dir_inode{dir_inode}, parent_dir_inode{parent_dir_inode}, file_inode{file_inode} {}
     
       const value to_document(); 
       static FSDirCollectionEntry bson_to_dir_collection_entry(view bson_doc);
 
       static constexpr std::string_view DIR_INODE_KEY = "_id";
+      static constexpr std::string_view PARENT_DIR_INODE_KEY = "parent_dir_inode";
       static constexpr std::string_view FILE_INODE_KEY = "file_inode";
     
       INODE dir_inode;
+      INODE parent_dir_inode;
       INODE file_inode;
   };
 
   class FSDirCollection {
     public:
-      static std::optional<INODE> create_entry(INODE dir_inode, INODE file_inode);
+      static std::optional<INODE> create_entry(INODE dir_inode, INODE parent_dir_inode, INODE file_inode);
       static std::vector<INODE> read_file_inodes(INODE dir_inode);
 
       static constexpr std::string_view NAME = "fs_dir";
