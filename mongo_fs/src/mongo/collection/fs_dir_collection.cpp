@@ -6,6 +6,7 @@ using namespace mongo;
 const value FSDirCollectionEntry::to_document() {
   return make_document(
     kvp(DIR_INODE_KEY, dir_inode),
+    kvp(PARENT_DIR_INODE_KEY, parent_dir_inode),
     kvp(FILE_INODE_KEY, file_inode)
   );
 }
