@@ -6,7 +6,6 @@
 #include "collection/fs_metadata_collection.h"
 #include "collection/fs_data_collection.h"
 #include "collection/fs_lookup_collection.h"
-#include "collection/fs_dir_collection.h"
 #include "../fs/perm.h"
 
 #define DB_URI "mongodb://localhost:27017"

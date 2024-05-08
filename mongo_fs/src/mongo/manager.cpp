@@ -14,7 +14,7 @@ void Manager::init_db() {
   fs::Mode mode{root_fs_dir_stat.st_mode};
   FSMetadataCollectionEntry fs_metadata_collection_entry {
     (INODE)root_fs_dir_stat.st_ino,
-    Manager::fs_root_path,
+    std::string("/"),
     std::string{FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE},
     mode,
     root_fs_dir_stat.st_atim.tv_sec,
@@ -24,7 +24,7 @@ void Manager::init_db() {
     (int)root_fs_dir_stat.st_gid,
   };
 
-  FSMetadataCollection::create_entry(fs_metadata_collection_entry);
+  FSMetadataCollection::create_entry_with_dir_parent((INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR, fs_metadata_collection_entry);
 }
 
 bool Manager::parent_dir_is_root(const char* path) {

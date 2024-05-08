@@ -19,9 +19,9 @@ int Operations::create(const char *path, mode_t mode, fuse_file_info *ffi) {
   } else {
     std::cout << "getattr null ffi" << std::endl;
   }
-  
-  mongo::FSMetadataCollectionEntry md_entry(path, mode, mongo::MDFileType::FILE);
-  mongo::FSMetadataCollection::create_entry(md_entry);
+
+  mongo::FSMetadataCollectionEntry md_entry{FSHelper::get_base_name_of_path(path).c_str(), mode, mongo::MDFileType::FILE};
+  mongo::FSMetadataCollection::create_entry(path, md_entry);
   
   POSTHANDLER_PRINT;
 
@@ -49,7 +49,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
   if (!ffi) {
     std::cout << "ffi null searching by path: " << path << std::endl;
-    md_entry_opt = mongo::FSMetadataCollection::search_by_path(path);
+    md_entry_opt = mongo::FSMetadataCollection::get_entry_from_path(path);
   } else {
     std::cout << "ffi not null searching by fd: " << ffi->fh << std::endl;
     md_entry_opt = mongo::FSMetadataCollection::search_by_inode(ffi->fh);
@@ -81,8 +81,8 @@ int Operations::mknod(const char*, mode_t, dev_t) U;
 int Operations::mkdir(const char* path, mode_t mode)  {
   PREHANDLER_PRINT;
 
-  mongo::FSMetadataCollectionEntry fs_metadata_collection_entry{path, mode, mongo::MDFileType::DIR};
-  mongo::FSMetadataCollection::create_entry(fs_metadata_collection_entry);
+  mongo::FSMetadataCollectionEntry fs_metadata_collection_entry{FSHelper::get_base_name_of_path(path).c_str(), mode, mongo::MDFileType::DIR};
+  mongo::FSMetadataCollection::create_entry(path, fs_metadata_collection_entry);
 
   POSTHANDLER_PRINT;
 
@@ -101,7 +101,7 @@ int Operations::truncate(const char*, off_t, fuse_file_info*) U;
 int Operations::open(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
 
-  std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
+  /*std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
 
   std::cout << "open called with path: " << path << std::endl;
   md_entry_opt = mongo::FSMetadataCollection::search_by_path(path);
@@ -135,7 +135,7 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
   if(ffi->flags & O_APPEND) {
     std::cout << "O_APPEND ";
   }
-  std::cout << std::endl;
+  std::cout << std::endl;*/
   POSTHANDLER_PRINT;
 
   return FS_OPERATION_SUCCESS;

@@ -24,6 +24,7 @@
 #define BLOCK_SIZE 512
 // FIXME: put somewhere better?
 #define MAX_FS_ROOT_PATH 256
+#define PARENT_DIR_INODE_OF_ROOT_FS_DIR 0
 
 namespace mongo {
 

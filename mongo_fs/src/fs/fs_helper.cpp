@@ -2,6 +2,12 @@
 
 using namespace fs;
 
+std::string FSHelper::get_base_name_of_path(const char* c_str_path) {
+  std::filesystem::path path{c_str_path};
+  return path.filename().string();
+}
+
+
 std::vector<std::string> FSHelper::get_path_components(const char* c_str_path) {
   std::vector<std::string> res_vec{};
   std::cout << "parsing path: " << c_str_path << " into components" << std::endl;
