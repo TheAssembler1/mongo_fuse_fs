@@ -12,9 +12,10 @@
 
 namespace fs {
 
-  class Helper {
+  class FSHelper {
     public:
       static std::vector<std::string> get_path_components(const char* path);
+      static std::string get_parent_dir_string(const char* c_str_path);
       static struct stat get_stat_of_root_fs();
       static INODE get_inode_of_root_fs();
   };

@@ -44,7 +44,6 @@ namespace mongo {
     public:
       static std::optional<INODE> create_entry(INODE dir_inode, INODE parent_dir_inode, INODE file_inode);
       static std::vector<INODE> read_file_inodes(INODE dir_inode);
-
       static constexpr std::string_view NAME = "fs_dir";
   };
 

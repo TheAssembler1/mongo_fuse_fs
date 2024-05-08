@@ -41,7 +41,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   }
 
   if(strcmp(path, "/") == 0) {
-    struct stat root_fs_dir_stat = Helper::get_stat_of_root_fs();
+    struct stat root_fs_dir_stat = FSHelper::get_stat_of_root_fs();
     memcpy(stat, &root_fs_dir_stat, sizeof(struct stat)); 
     return FS_OPERATION_SUCCESS;
   }
@@ -72,11 +72,23 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   POSTHANDLER_PRINT;
 
   return -ENOENT;
-};
+}
 
 int Operations::readlink(const char*, char*, size_t) U;
 int Operations::mknod(const char*, mode_t, dev_t) U; 
-int Operations::mkdir(const char*, mode_t) U;
+
+// FIXME: check file doesn't already exists and permissions etc.
+int Operations::mkdir(const char* path, mode_t mode)  {
+  PREHANDLER_PRINT;
+
+  mongo::FSMetadataCollectionEntry fs_metadata_collection_entry{path, mode, mongo::MDFileType::DIR};
+  mongo::FSMetadataCollection::create_entry(fs_metadata_collection_entry);
+
+  POSTHANDLER_PRINT;
+
+  return FS_OPERATION_SUCCESS;
+}
+
 int Operations::unlink(const char*) U;
 int Operations::rmdir(const char*) U;
 int Operations::symlink(const char*, const char*) U;
@@ -166,14 +178,14 @@ int Operations::listxattr(const char*, char*, size_t) U;
 int Operations::removexattr(const char*, const char*) U;
 #endif
 
-int Operations::opendir(const char* path, fuse_file_info*) {
+int Operations::opendir(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
   std::cout << "opendir path=" << path << std::endl;
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
 
-int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) { std::cout << "readdir path=" << path << std::endl;
+int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) {
   PREHANDLER_PRINT;
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;

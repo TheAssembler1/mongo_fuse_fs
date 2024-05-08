@@ -15,7 +15,7 @@ set(EXTERNAL_LIBS
   "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/lib/libbsoncxx.so"
 )
 
-set(EXTERNAL_HEADERS 
+set(EXTERNAL_HEADERS
   "${CMAKE_SOURCE_DIR}/external/fuse3/install/include/fuse3"
   "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/include/mongocxx/v_noabi"
   "${CMAKE_SOURCE_DIR}/external/mongo-cxx-driver-r3.10.1/install/include/bsoncxx/v_noabi"
@@ -26,12 +26,13 @@ set(SOURCES
     src/entry.cpp
     src/fs/handler.cpp
     src/fs/perm.cpp
-    src/fs/helper.cpp
+    src/fs/fs_helper.cpp
     src/mongo/manager.cpp
     src/mongo/collection/fs_metadata_collection.cpp
     src/mongo/collection/fs_data_collection.cpp
     src/mongo/collection/fs_lookup_collection.cpp
     src/mongo/collection/fs_dir_collection.cpp
+    src/mongo/collection/collection_helper.cpp
 )
 
 # Create executable

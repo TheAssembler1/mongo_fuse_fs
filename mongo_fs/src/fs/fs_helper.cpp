@@ -1,8 +1,8 @@
-#include "helper.h"
+#include "fs_helper.h"
 
 using namespace fs;
 
-std::vector<std::string> Helper::get_path_components(const char* c_str_path) {
+std::vector<std::string> FSHelper::get_path_components(const char* c_str_path) {
   std::vector<std::string> res_vec{};
   std::cout << "parsing path: " << c_str_path << " into components" << std::endl;
   std::filesystem::path path{c_str_path};
@@ -35,7 +35,18 @@ std::vector<std::string> Helper::get_path_components(const char* c_str_path) {
   return res_vec;
 }
 
-struct stat Helper::get_stat_of_root_fs() {
+std::string FSHelper::get_parent_dir_string(const char* c_str_path) {
+  std::filesystem::path path{c_str_path};
+
+  if(!path.has_parent_path()) {
+    std::cerr << "ERROR: child does not have parent path";
+    return std::string{};
+  }
+
+  return std::string(path.parent_path().c_str());
+}
+
+struct stat FSHelper::get_stat_of_root_fs() {
   struct stat res_stat;
   memset(&res_stat, 0, sizeof(struct stat));
 
@@ -50,7 +61,7 @@ struct stat Helper::get_stat_of_root_fs() {
   return res_stat;
 }
 
-INODE Helper::get_inode_of_root_fs() {
-  struct stat res_stat = Helper::get_stat_of_root_fs();
+INODE FSHelper::get_inode_of_root_fs() {
+  struct stat res_stat = FSHelper::get_stat_of_root_fs();
   return res_stat.st_ino;
 }

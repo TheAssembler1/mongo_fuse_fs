@@ -9,10 +9,10 @@
 int main(int argc, char *argv[]) {
   fuse_config config;
   config.nullpath_ok = true;
-  
+
   char cwd[MAX_FS_ROOT_PATH];
   memset(cwd, 0, MAX_FS_ROOT_PATH);
-  
+
   if(getcwd(cwd, MAX_FS_ROOT_PATH) != nullptr) {
     mongo::Manager::fs_root_path = std::string{cwd};
     std::cout << "FS root path: " << mongo::Manager::fs_root_path << std::endl;

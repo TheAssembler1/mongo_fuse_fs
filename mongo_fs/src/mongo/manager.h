@@ -16,7 +16,7 @@
 #include "collection/fs_metadata_collection.h"
 #include "connection.h"
 #include "../fs/perm.h"
-#include "../fs/helper.h"
+#include "../fs/fs_helper.h"
 
 // NOTE: for database =========================================
 // the name of the database used to store all fs data
@@ -31,6 +31,7 @@ namespace mongo {
     public:
       static void init_db();
       static int generate_id();
+      static bool parent_dir_is_root(const char* path);
 
       static inline uint64_t cur_max_fd = 0;
       static inline std::string fs_root_path = std::string{};
