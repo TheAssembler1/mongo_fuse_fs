@@ -40,6 +40,13 @@ const value FSMetadataCollectionEntry::to_document() {
   );
 }
 
+void FSMetadataCollection::remove_mtn_dir() {
+  INODE root_inode = fs::FSHelper::get_inode_of_root_fs();
+  Connection conn;
+  auto ms_data_collection = GET_FS_METADATA_COLLECTION(&conn);
+
+  ms_data_collection.delete_one(make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, (INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR)));
+}
 
 FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name, mode_t _mode, MDFileType _file_type) {
   inode = Manager::generate_id();
@@ -151,7 +158,6 @@ std::vector<FSMetadataCollectionEntry> FSMetadataCollection::get_child_md_entrie
   std::vector<FSMetadataCollectionEntry> res{};
   Connection conn;
   auto fs_metadata_collection = GET_FS_METADATA_COLLECTION(&conn);
-
   auto docs_bson = fs_metadata_collection.find(make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, parent_dir_inode)));
 
   for(auto doc_bson: docs_bson) {
@@ -174,6 +180,15 @@ std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_child_entry_f
   return std::nullopt;
 }
 
+FSMetadataCollectionEntry FSMetadataCollection::get_md_entry_of_fs_root_dir() {
+  INODE root_inode = fs::FSHelper::get_inode_of_root_fs();
+  auto entry_opt = search_by_inode(root_inode);
+  assert(entry_opt.has_value());
+  auto entry = entry_opt.value();
+
+  return entry;
+}
+
 std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_entry_from_path(const char* path) {
   std::string base_name = fs::FSHelper::get_base_name_of_path(path);
   auto parent_inode_opt = reach_parent_inode(path);
@@ -181,6 +196,11 @@ std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_entry_from_pa
   if(!parent_inode_opt.has_value()) {
     std::cerr << "ERROR: parent inode was inode from path: " << path << " found!" << std::endl;
     return std::nullopt;
+  }
+
+  if(parent_inode_opt.value() == 0) {
+    std::cout << "fs root dir was specified by path" << std::endl;
+    return get_md_entry_of_fs_root_dir();
   }
 
   auto parent_inode = parent_inode_opt.value();
@@ -198,7 +218,19 @@ std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_entry_from_pa
 
 std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) {
   std::vector<std::string> path_components = fs::FSHelper::get_path_components(path);
-  assert(path_components.size() >= 2);
+  assert(path_components.size() >= 1);
+
+  if(path_components.size() == 1) {
+    std::cout << "path components vector of size 1: " << path_components[0] << std::endl;
+
+    if(path_components[0] == "/") {
+      std::cout << "fs root dir specified by reach_parent_inode" << std::endl;
+      return PARENT_DIR_INODE_OF_ROOT_FS_DIR;
+    }
+
+    std::cerr << "invalid path: " << path << std::endl;
+    assert(false);
+  }
 
   // NOTE: removing base file name
   path_components.pop_back();

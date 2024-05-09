@@ -31,12 +31,6 @@ std::vector<std::string> FSHelper::get_path_components(const char* c_str_path) {
 
   // FIXME: do better?
   std::reverse(res_vec.begin(), res_vec.end());
-  
-  std::cout << "result path" << std::endl << std::endl;
-  for(std::string str: res_vec) {
-    std::cout << str << std::endl;
-  }
-  std::cout << std::endl << "end result path" << std::endl;
 
   return res_vec;
 }

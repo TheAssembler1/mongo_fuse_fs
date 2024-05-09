@@ -10,6 +10,10 @@ using namespace mongo;
 void Manager::init_db() {
   std::cout << "init database" << std::endl;
 
+  // NOTE: removing previous mnt dir
+  std::cout << "removingd mnt dir" << std::endl;
+  FSMetadataCollection::remove_mtn_dir();
+
   struct stat root_fs_dir_stat = fs::FSHelper::get_stat_of_root_fs();
   fs::Mode mode{root_fs_dir_stat.st_mode};
   FSMetadataCollectionEntry fs_metadata_collection_entry {

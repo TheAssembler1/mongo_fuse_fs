@@ -180,13 +180,50 @@ int Operations::removexattr(const char*, const char*) U;
 
 int Operations::opendir(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
-  std::cout << "opendir path=" << path << std::endl;
+  std::cout << "opendir called with path: " << path << std::endl;
+
+  auto fs_metadata_collection_entry_opt = mongo::FSMetadataCollection::get_entry_from_path(path);
+  if(!fs_metadata_collection_entry_opt.has_value()) {
+    std::cerr << "not able to find dir with path: " << path << std::endl;
+    return -ENOENT;
+  }
+
+  INODE dir_inode = fs_metadata_collection_entry_opt.value().inode;
+  std::cout << "setting ffi fd: " << dir_inode << std::endl;
+  ffi->fh = dir_inode;
+
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
 
+// NOTE: MODE 1: https://libfuse.github.io/doxygen/structfuse__operations.html#ae269583c4bfaf4d9a82e1d51a902cd5c
+// FIXME: don't pass NULL to stat struct of filler, I believe this makes it call getattr on each path returned...
+// FIMXES: is FUSE_FILL_DIR_PLUS the correct macro to pass here?
 int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) {
   PREHANDLER_PRINT;
+
+  INODE parent_inode;
+  if(path) {
+    std::cerr << "readdir called with path: " << path << std::endl;
+    assert(false);
+    return -ENOENT;
+  } else {
+    std::cout << "readdir called with fd: " << ffi->fh << std::endl;
+    assert(ffi->fh);
+    parent_inode = ffi->fh;
+  }
+
+  std::vector<mongo::FSMetadataCollectionEntry> children = mongo::FSMetadataCollection::get_child_md_entries_of_parent_dir(parent_inode);
+
+  // NOTE: fill in def inodes
+  filler(data, ".", NULL, 0, FUSE_FILL_DIR_PLUS);
+  filler(data, "..", NULL, 0, FUSE_FILL_DIR_PLUS);
+
+  for(auto child: children) {
+    std::cout << child.base_name << std::endl;
+    filler(data, child.base_name.c_str(), NULL, 0, FUSE_FILL_DIR_PLUS);
+  }
+
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
 }
@@ -234,7 +271,10 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offse
   for(int i = 0; i < f_bvec->count; i++) {
     auto f_b = f_bvec->buf[i];
 
-    assert(ffi->fh != 0);
+    if(ffi->fh == 0) {
+      std::cerr << "ERROR: write_buf called with fd: 0 and path: " << path << std::endl;
+      assert(false);
+    }
 
     std::cout << "write_buf called with fd: " << (int)ffi->fh << std::endl;
     auto md_entry_opt = mongo::FSMetadataCollection::search_by_inode(ffi->fh);
