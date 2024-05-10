@@ -8,7 +8,7 @@ using bsoncxx::binary_sub_type;
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
 
-std::optional<int> FSDataCollection::create_entry(INODE inode, FSDataCollectionEntry fs_data_collection_entry) {
+std::optional<FS_DATA_ID> FSDataCollection::create_entry(INODE inode, FSDataCollectionEntry& fs_data_collection_entry) {
   Connection conn;
   auto file_collection = GET_FS_DATA_COLLECTION(&conn);
 

@@ -39,7 +39,7 @@ namespace mongo {
   class FSLookupCollection {
     public:
       static std::optional<int> get_max_order();
-      static std::optional<int> create_entry(FSLookupCollectionEntry fs_lookup_collection_entry);
+      static std::optional<int> create_entry(FSLookupCollectionEntry& fs_lookup_collection_entry);
       static std::vector<FS_DATA_ID> get_fs_data_ids();
 
       static constexpr std::string_view NAME = "fs_lookup";

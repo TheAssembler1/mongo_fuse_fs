@@ -26,7 +26,7 @@ std::optional<int> FSLookupCollection::get_max_order() {
   return prev_max_fs_lookup_block[FSDataCollectionEntry::FS_DATA_ID_KEY].get_int32() + 1; 
 }
 
-std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry fs_lookup_collection_entry) {
+std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry& fs_lookup_collection_entry) {
   Connection conn; 
   auto fs_lookup_collection = GET_FS_LOOKUP_COLLECTION(&conn);
   auto last_order = get_max_order();

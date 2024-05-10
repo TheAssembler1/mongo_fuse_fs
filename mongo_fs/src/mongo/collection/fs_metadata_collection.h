@@ -79,15 +79,15 @@ namespace mongo {
 
     class FSMetadataCollection {
         public:      
-            static std::optional<INODE> create_entry(const char* path, FSMetadataCollectionEntry fs_metadata_collection_entry);
-            static std::optional<INODE> create_entry_with_dir_parent(INODE dir_parent_inode, FSMetadataCollectionEntry fs_metadata_collection_entry);
+            static std::optional<INODE> create_entry(const char* path, FSMetadataCollectionEntry& fs_metadata_collection_entry);
+            static std::optional<INODE> create_entry_with_dir_parent(INODE dir_parent_inode, FSMetadataCollectionEntry& fs_metadata_collection_entry);
             static std::optional<FSMetadataCollectionEntry> search_by_inode(INODE inode);
-            static std::optional<FSMetadataCollectionEntry> search_by_base_name(std::string base_name);
+            static std::optional<FSMetadataCollectionEntry> search_by_base_name(std::string& base_name);
             static std::optional<INODE> reach_parent_inode(const char* path);
             static std::optional<FSMetadataCollectionEntry> get_entry_from_path(const char* path);
             static FSMetadataCollectionEntry get_md_entry_of_fs_root_dir();
             static std::vector<FSMetadataCollectionEntry> get_child_md_entries_of_parent_dir(INODE parent_dir_inode);
-            static std::optional<FSMetadataCollectionEntry> get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string child_base_name);
+            static std::optional<FSMetadataCollectionEntry> get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string& child_base_name);
             static bool inode_is_parent(INODE parent_dir_inode, INODE child_inode);
             static constexpr std::string_view NAME = "fs_metadata";
             static void remove_mtn_dir();

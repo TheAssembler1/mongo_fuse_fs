@@ -65,7 +65,7 @@ FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name, mod
   gid = (int)fuse_context->gid;
 }
 
-std::optional<INODE> FSMetadataCollection::create_entry(const char* path, FSMetadataCollectionEntry fs_metadata_collection_entry) {
+std::optional<INODE> FSMetadataCollection::create_entry(const char* path, FSMetadataCollectionEntry& fs_metadata_collection_entry) {
   // NOTE: veryfing valid path and getting parent inodec
   auto parent_dir_inode_opt = reach_parent_inode(path);
 
@@ -80,7 +80,7 @@ std::optional<INODE> FSMetadataCollection::create_entry(const char* path, FSMeta
   return inode;
 }
 
-std::optional<INODE> FSMetadataCollection::create_entry_with_dir_parent(INODE dir_parent_inode, FSMetadataCollectionEntry fs_metadata_collection_entry) {
+std::optional<INODE> FSMetadataCollection::create_entry_with_dir_parent(INODE dir_parent_inode, FSMetadataCollectionEntry& fs_metadata_collection_entry) {
   fs_metadata_collection_entry.set_parent_dir_inode(dir_parent_inode);
 
   Connection conn;
@@ -106,7 +106,7 @@ std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_inode(I
   return FSMetadataCollectionEntry::bson_to_md_entry(doc.value());
 }
 
-std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_base_name(std::string base_name) {
+std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_base_name(std::string& base_name) {
   Connection conn;
   auto md_collection = GET_FS_METADATA_COLLECTION(&conn);
   auto doc = md_collection.find_one(make_document(kvp(FSMetadataCollectionEntry::BASE_NAME_KEY, base_name)));
@@ -168,7 +168,7 @@ std::vector<FSMetadataCollectionEntry> FSMetadataCollection::get_child_md_entrie
   return res;
 }
 
-std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string child_base_name) {
+std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string& child_base_name) {
   std::vector<FSMetadataCollectionEntry> children = get_child_md_entries_of_parent_dir(parent_dir_inode);
 
   for(auto child: children) {
