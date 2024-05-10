@@ -56,6 +56,16 @@ void FSMetadataCollection::remove_mtn_dir() {
   ms_data_collection.delete_one(make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, (INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR)));
 }
 
+void FSMetadataCollection::update_md_entry_size(INODE inode, int size) {
+  Connection conn;
+  auto collection = GET_FS_METADATA_COLLECTION(&conn);
+
+  collection.update_one(
+        make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, inode)),
+        make_document(kvp("$set", make_document(kvp(FSMetadataCollectionEntry::FILE_SIZE_KEY, size))))
+  );
+}
+
 FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name, mode_t _mode, MDFileType _file_type) {
   inode = Manager::generate_id();
 
@@ -94,6 +104,9 @@ std::optional<INODE> FSMetadataCollection::create_entry_with_dir_parent(INODE di
   // NOTE: setting init size
   if(fs_metadata_collection_entry.file_type == FSMetadataCollectionEntry::FILE_TYPE_FILE_VALUE) {
     fs_metadata_collection_entry.file_size = 0;
+
+    // NOTE: creating data and lookup entry for block 0
+    CollectionHelper::create_next_data_lookup_entries(fs_metadata_collection_entry.inode);
   }
 
   Connection conn;

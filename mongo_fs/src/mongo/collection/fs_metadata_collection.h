@@ -17,6 +17,7 @@
 #include "../connection.h"
 #include "fs_lookup_collection.h"
 #include "fs_data_collection.h"
+#include "collection_helper.h"
 
 using bsoncxx::v_noabi::document::value;
 using bsoncxx::v_noabi::document::view;
@@ -90,6 +91,7 @@ namespace mongo {
             static FSMetadataCollectionEntry get_md_entry_of_fs_root_dir();
             static std::vector<FSMetadataCollectionEntry> get_child_md_entries_of_parent_dir(INODE parent_dir_inode);
             static std::optional<FSMetadataCollectionEntry> get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string& child_base_name);
+            static void update_md_entry_size(INODE inode, int size);
             static bool inode_is_parent(INODE parent_dir_inode, INODE child_inode);
             static constexpr std::string_view NAME = "fs_metadata";
             static void remove_mtn_dir();

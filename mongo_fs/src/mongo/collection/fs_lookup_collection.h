@@ -33,7 +33,7 @@ namespace mongo {
 
       static FSLookupCollectionEntry bson_to_entry(value bson_doc);
 
-      static constexpr std::string_view ID_INODE_KEY = "_id";
+      static constexpr std::string_view INODE_KEY = "inode";
       static constexpr std::string_view ORDER_KEY = "order";
       static constexpr std::string_view DATA_BLOCK_ID_KEY = "data_block_id";
       
@@ -46,8 +46,9 @@ namespace mongo {
   class FSLookupCollection {
     public:
       static std::optional<int> get_max_order();
-      static std::optional<int> create_entry(FSLookupCollectionEntry& fs_lookup_collection_entry);
+      static std::optional<int> create_next_entry(FSLookupCollectionEntry& fs_lookup_collection_entry);
       static std::optional<FSLookupCollectionEntry> read_entry_with_inode_order(INODE inode, int order);
+      static std::vector<FS_DATA_ID> get_fs_data_ids(INODE inode);
 
       static constexpr std::string_view NAME = "fs_lookup";
   };
