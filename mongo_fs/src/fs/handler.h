@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "../mongo/collection/collection_helper.h"
 #include "../mongo/collection/fs_lookup_collection.h"
 #include "../mongo/collection/fs_data_collection.h"
 #include "../mongo/collection/fs_metadata_collection.h"

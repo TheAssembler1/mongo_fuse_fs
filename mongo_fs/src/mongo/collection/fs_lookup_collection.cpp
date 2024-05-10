@@ -7,13 +7,21 @@ using namespace mongo;
 #define MONGO_ASC_ORDER 1
 #define MONGO_DESC_ORDER -1
 
+FSLookupCollectionEntry FSLookupCollectionEntry::bson_to_entry(value bson_doc) {
+  return FSLookupCollectionEntry(
+    bson_doc[ID_INODE_KEY].get_int32(),
+    bson_doc[ORDER_KEY].get_int32(),
+    bson_doc[DATA_BLOCK_ID_KEY].get_int32()
+  );
+}
+
 std::optional<int> FSLookupCollection::get_max_order() {
   Connection conn; 
 
   auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
   auto query_pipeline = mongocxx::pipeline();
-  query_pipeline.sort(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, MONGO_DESC_ORDER)));
+  query_pipeline.sort(make_document(kvp(FSLookupCollectionEntry::ORDER_KEY, MONGO_DESC_ORDER)));
   query_pipeline.limit(1);
 
   auto cursor = fs_blocks_collection.aggregate(query_pipeline);
@@ -23,7 +31,7 @@ std::optional<int> FSLookupCollection::get_max_order() {
     return std::nullopt;
   }
 
-  return prev_max_fs_lookup_block[FSDataCollectionEntry::FS_DATA_ID_KEY].get_int32() + 1; 
+  return prev_max_fs_lookup_block[FSLookupCollectionEntry::ID_INODE_KEY].get_int32() + 1;
 }
 
 std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry& fs_lookup_collection_entry) {
@@ -37,9 +45,9 @@ std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry& fs_
   }
   
   auto query_res = fs_lookup_collection.insert_one(make_document(
-    kvp(FS_LOOKUP_ID_KEY, fs_lookup_collection_entry.inode),
-    kvp(FS_LOOKUP_FS_ENTRY_KEY,  fs_lookup_collection_entry.fs_data_id),
-    kvp(FS_LOOKUP_FILE_ORDER_NUMBER_KEY, cur_order)
+    kvp(FSLookupCollectionEntry::ID_INODE_KEY, fs_lookup_collection_entry.inode),
+    kvp(FSLookupCollectionEntry::DATA_BLOCK_ID_KEY,  fs_lookup_collection_entry.fs_data_id),
+    kvp(FSLookupCollectionEntry::ORDER_KEY, cur_order)
   ));
 
   assert(query_res);
@@ -51,20 +59,18 @@ std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry& fs_
   return fs_lookup_collection_entry.inode;
 }
 
-std::vector<FS_DATA_ID> FSLookupCollection::get_fs_data_ids() {
-  Connection conn; 
+std::optional<FSLookupCollectionEntry> FSLookupCollection::read_entry_with_inode_order(INODE inode, int order) {
+  std::optional<FSLookupCollectionEntry> res = std::nullopt;
 
-  auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
+  Connection conn;
+  auto collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
-  auto query_pipeline = mongocxx::pipeline();
-  query_pipeline.sort(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, MONGO_ASC_ORDER)));
-  auto cursor = fs_blocks_collection.aggregate(query_pipeline);
-  
-  std::vector<FS_DATA_ID> result_vec;
+  auto doc_bson = collection.find_one(make_document(
+    kvp(FSLookupCollectionEntry::ID_INODE_KEY, inode),
+    kvp(FSLookupCollectionEntry::ORDER_KEY, order)
+  ));
 
-  for(auto& item: cursor) {
-    auto fs_id = item[FSDataCollectionEntry::FS_DATA_ID_KEY].get_int32(); 
-  }
+  assert(doc_bson);
 
-  return result_vec;
+  return FSLookupCollectionEntry::bson_to_entry(doc_bson.value());
 }

@@ -31,6 +31,7 @@ set(SOURCES
     src/mongo/collection/fs_metadata_collection.cpp
     src/mongo/collection/fs_data_collection.cpp
     src/mongo/collection/fs_lookup_collection.cpp
+    src/mongo/collection/collection_helper.cpp
 )
 
 # Create executable

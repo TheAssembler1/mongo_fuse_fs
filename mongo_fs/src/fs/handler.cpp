@@ -144,7 +144,7 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
 int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
 
-  std::cout << "read called with fd: " << ffi->fh << std::endl;
+  /*std::cout << "read called with fd: " << ffi->fh << std::endl;
 
   std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt =  mongo::FSMetadataCollection::search_by_inode(ffi->fh);
 
@@ -159,9 +159,9 @@ int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset,
   }
 
   std::vector<mongo::FSDataCollectionEntry> fs_data_collection_entires = mongo::FSDataCollection::read_all_fs_data_blocks(ffi->fh);
-  POSTHANDLER_PRINT;
+  POSTHANDLER_PRINT;*/
 
-  return size;
+  return FS_OPERATION_SUCCESS;
 }
 
 int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U;
@@ -263,38 +263,11 @@ int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) 
 int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
   PREHANDLER_PRINT;
 
-  std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
-  std::cout << "number of buffers: " << f_bvec->count << std::endl;
-  std::cout << "write_buf offset: " << f_bvec->off << std::endl;
-
-  for(int i = 0; i < f_bvec->count; i++) {
-    auto f_b = f_bvec->buf[i];
-
-    if(ffi->fh == 0) {
-      std::cerr << "ERROR: write_buf called with fd: 0 and path: " << path << std::endl;
-      assert(false);
-    }
-
-    std::cout << "write_buf called with fd: " << (int)ffi->fh << std::endl;
-    auto md_entry_opt = mongo::FSMetadataCollection::search_by_inode(ffi->fh);
-
-    if(!md_entry_opt.has_value()) {
-      std::cerr << "md entry has no value in write_buf" << std::endl;
-    }
-
-    auto md_entry = md_entry_opt.value();
-    mongo::FSDataCollectionEntry fs_data_entry = mongo::FSDataCollectionEntry{(long int)f_b.size, (char*)f_b.mem};
-    std::optional<int> bytes_written_opt = mongo::FSDataCollection::create_entry(ffi->fh, fs_data_entry);
-
-    if(!bytes_written_opt.has_value() != f_b.size) {
-      std::cerr << "bytes written != to buffer size" << std::endl;
-      std::cerr << "bytes written: " << bytes_written_opt.value() << std::endl;
-    }
-  }
+  mongo::CollectionHelper::write_blocks_to_mongo(path, *f_bvec, *ffi);
 
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
-};
+}
 
 int Operations::read_buf(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info* ffi) {
     assert(!path);

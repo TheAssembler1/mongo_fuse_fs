@@ -58,19 +58,3 @@ std::optional<FSDataCollectionEntry> FSDataCollection::read_entry(FS_DATA_ID fs_
   auto bson_doc = bson_res.value();
   return FSDataCollectionEntry::bson_to_entry(bson_doc);
 }
-
-
-std::vector<FSDataCollectionEntry> FSDataCollection::read_all_fs_data_blocks(INODE inode) {
-  std::vector<FS_DATA_ID> fs_data_ids = FSLookupCollection::get_fs_data_ids();
-  std::vector<FSDataCollectionEntry> fs_data_entries;
-  
-  // FIXME : assumes only has one block
-  for(auto fs_data_id: fs_data_ids) {
-    std::optional<FSDataCollectionEntry> fs_data_collection_entry_opt = FSDataCollection::read_entry(fs_data_id);
-
-    assert(fs_data_collection_entry_opt.has_value());
-    fs_data_entries.push_back(fs_data_collection_entry_opt.value());
-  }
-
-  return fs_data_entries;
-}

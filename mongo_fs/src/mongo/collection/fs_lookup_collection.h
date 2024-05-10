@@ -15,24 +15,31 @@
 #include "types.h"
 #include "../connection.h"
 
-#define FS_LOOKUP_ID_KEY "_id"
-#define FS_LOOKUP_FILE_ORDER_NUMBER_KEY "order"
-#define FS_LOOKUP_FS_ENTRY_KEY "fs_entry_id"
-
 using bsoncxx::types::b_binary;
 using bsoncxx::binary_sub_type;
 using bsoncxx::binary_sub_type;
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
+using bsoncxx::v_noabi::document::value;
+using bsoncxx::v_noabi::document::view;
+using bsoncxx::v_noabi::document::view_or_value;
 
 namespace mongo {
 
   class FSLookupCollectionEntry {
     public:
       FSLookupCollectionEntry(INODE inode, FS_DATA_ID fs_data_id) : inode{inode}, fs_data_id {fs_data_id} {}
+      FSLookupCollectionEntry(INODE inode, int order, FS_DATA_ID fs_data_id) : inode{inode}, order{order}, fs_data_id {fs_data_id} {}
+
+      static FSLookupCollectionEntry bson_to_entry(value bson_doc);
+
+      static constexpr std::string_view ID_INODE_KEY = "_id";
+      static constexpr std::string_view ORDER_KEY = "order";
+      static constexpr std::string_view DATA_BLOCK_ID_KEY = "data_block_id";
       
       std::optional<int> fs_lookup_id;
       INODE inode;
+      int order;
       FS_DATA_ID fs_data_id;
   };
 
@@ -40,7 +47,7 @@ namespace mongo {
     public:
       static std::optional<int> get_max_order();
       static std::optional<int> create_entry(FSLookupCollectionEntry& fs_lookup_collection_entry);
-      static std::vector<FS_DATA_ID> get_fs_data_ids();
+      static std::optional<FSLookupCollectionEntry> read_entry_with_inode_order(INODE inode, int order);
 
       static constexpr std::string_view NAME = "fs_lookup";
   };
