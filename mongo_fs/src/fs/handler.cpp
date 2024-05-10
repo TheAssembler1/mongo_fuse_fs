@@ -4,7 +4,7 @@
 #define FS_OPERATION_SUCCESS 0
 
 #define PREHANDLER_PRINT std::cout << "===================================" << std::endl << "executing function: " << __FUNCTION__ << " handler" << std::endl
-#define POSTHANDLER_PRINT std::cout << std::endl << "done executing function: " << __FUNCTION__ << " handler" << std::endl << "===================================" << std::endl
+#define POSTHANDLER_PRINT std::cout << "done executing function: " << __FUNCTION__ << " handler" << std::endl << "===================================" << std::endl
 #define U {PREHANDLER_PRINT; POSTHANDLER_PRINT; return FS_OPERATION_SUCCESS;}
 
 using namespace fs;
@@ -263,7 +263,7 @@ int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) 
 int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
   PREHANDLER_PRINT;
 
-  mongo::CollectionHelper::write_blocks_to_mongo(path, *f_bvec, *ffi);
+  mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, *ffi);
 
   POSTHANDLER_PRINT;
   return FS_OPERATION_SUCCESS;
