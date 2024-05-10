@@ -59,7 +59,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     mongo::FSMetadataCollectionEntry md_entry = md_entry_opt.value();
     stat->st_ino = md_entry.inode;
     stat->st_mode = md_entry.to_mode_t();
-    stat->st_size = 0;
+    stat->st_size = 10;
     stat->st_gid = md_entry.gid;
     stat->st_uid = md_entry.uid;
     stat->st_atim = std::timespec{md_entry.last_access, 0};
@@ -296,7 +296,37 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offse
   return FS_OPERATION_SUCCESS;
 };
 
-int Operations::read_buf(const char*, fuse_bufvec**, size_t, off_t, fuse_file_info*) U;
+int Operations::read_buf(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info* ffi) {
+    assert(!path);
+    
+    // FIXME: could be multibuffer read for now assume buffer size of 1
+    *_f_bvec = new fuse_bufvec[sizeof(struct fuse_bufvec) + 1 * sizeof(struct fuse_buf)]();
+    auto f_bvec = *_f_bvec;
+    
+    // NOTE: number of buffers
+    f_bvec->count = 1;
+    f_bvec->idx = 0;
+    f_bvec->off = 0;
+    
+    // NOTE: size of internal buffer
+    f_bvec->buf->size= 10;
+    char* buffer = (char*)f_bvec->buf->mem;
+
+    for(int i = 0; i < f_bvec->count; i++) {
+        buffer[i] = 't';
+    }
+
+    PREHANDLER_PRINT;
+
+    std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
+    std::cout << "number of buffers: " << f_bvec->count << std::endl;
+    std::cout << "write_buf offset: " << f_bvec->off << std::endl;
+    
+
+    POSTHANDLER_PRINT;
+    return FS_OPERATION_SUCCESS;
+}
+
 int Operations::flock(const char*, fuse_file_info*, int) U;
 int Operations::fallocate(const char*, int, off_t, off_t, fuse_file_info*) U;
 ssize_t Operations::copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int) U;
