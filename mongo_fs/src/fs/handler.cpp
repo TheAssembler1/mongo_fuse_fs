@@ -101,10 +101,10 @@ int Operations::truncate(const char*, off_t, fuse_file_info*) U;
 int Operations::open(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
 
-  /*std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
+  std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt = std::nullopt;
 
   std::cout << "open called with path: " << path << std::endl;
-  md_entry_opt = mongo::FSMetadataCollection::search_by_path(path);
+  md_entry_opt = mongo::FSMetadataCollection::get_entry_from_path(path);
 
   if(!md_entry_opt.has_value()) {
     return -ENOENT;
@@ -135,7 +135,7 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
   if(ffi->flags & O_APPEND) {
     std::cout << "O_APPEND ";
   }
-  std::cout << std::endl;*/
+  std::cout << std::endl;
   POSTHANDLER_PRINT;
 
   return FS_OPERATION_SUCCESS;
@@ -165,7 +165,6 @@ int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset,
 }
 
 int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U;
-
 int Operations::statfs(const char*, struct statvfs*) U;
 int Operations::flush(const char*, fuse_file_info*) U;
 int Operations::release(const char*, fuse_file_info*) U;

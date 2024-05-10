@@ -10,7 +10,7 @@ using namespace mongo;
 std::optional<int> FSLookupCollection::get_max_order() {
   Connection conn; 
 
-  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
+  auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
   auto query_pipeline = mongocxx::pipeline();
   query_pipeline.sort(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, MONGO_DESC_ORDER)));
@@ -28,7 +28,7 @@ std::optional<int> FSLookupCollection::get_max_order() {
 
 std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry fs_lookup_collection_entry) {
   Connection conn; 
-  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
+  auto fs_lookup_collection = GET_FS_LOOKUP_COLLECTION(&conn);
   auto last_order = get_max_order();
 
   FS_DATA_ID cur_order = 0;
@@ -36,7 +36,7 @@ std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry fs_l
     cur_order = last_order.value();
   }
   
-  auto query_res = fs_blocks_collection.insert_one(make_document(
+  auto query_res = fs_lookup_collection.insert_one(make_document(
     kvp(FS_LOOKUP_ID_KEY, fs_lookup_collection_entry.inode),
     kvp(FS_LOOKUP_FS_ENTRY_KEY,  fs_lookup_collection_entry.fs_data_id),
     kvp(FS_LOOKUP_FILE_ORDER_NUMBER_KEY, cur_order)
@@ -54,7 +54,7 @@ std::optional<int> FSLookupCollection::create_entry(FSLookupCollectionEntry fs_l
 std::vector<FS_DATA_ID> FSLookupCollection::get_fs_data_ids() {
   Connection conn; 
 
-  auto fs_blocks_collection = GET_FS_DATA_COLLECTION(&conn);
+  auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
   auto query_pipeline = mongocxx::pipeline();
   query_pipeline.sort(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, MONGO_ASC_ORDER)));
