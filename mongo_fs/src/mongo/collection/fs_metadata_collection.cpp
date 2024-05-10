@@ -6,6 +6,11 @@ using bsoncxx::document::view_or_value;
 using namespace mongo;
 
 const value FSMetadataCollectionEntry::to_document() {
+  int final_size = -1;
+  if(file_size.has_value()) {
+    final_size = file_size.value();
+  }
+
   return make_document(
       kvp(INODE_KEY, inode),
       kvp(PARENT_DIR_INODE_KEY, parent_dir_inode),
@@ -36,7 +41,10 @@ const value FSMetadataCollectionEntry::to_document() {
 
       // set id's
       kvp(UID_KEY, (int)uid),
-      kvp(GID_KEY, (int)gid)
+      kvp(GID_KEY, (int)gid),
+
+      // file/dir size
+      kvp(FILE_SIZE_KEY, final_size)
   );
 }
 
@@ -82,6 +90,11 @@ std::optional<INODE> FSMetadataCollection::create_entry(const char* path, FSMeta
 
 std::optional<INODE> FSMetadataCollection::create_entry_with_dir_parent(INODE dir_parent_inode, FSMetadataCollectionEntry& fs_metadata_collection_entry) {
   fs_metadata_collection_entry.set_parent_dir_inode(dir_parent_inode);
+
+  // NOTE: setting init size
+  if(fs_metadata_collection_entry.file_type == FSMetadataCollectionEntry::FILE_TYPE_FILE_VALUE) {
+    fs_metadata_collection_entry.file_size = 0;
+  }
 
   Connection conn;
   auto md_collection = GET_FS_METADATA_COLLECTION(&conn);
@@ -262,38 +275,46 @@ std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) 
 
 FSMetadataCollectionEntry FSMetadataCollectionEntry::bson_to_md_entry(view bson_doc) {
   fs::Mode mode(
-  fs::Perm{bson_doc[USER_MODE_READ_KEY].get_bool().value, 
-           bson_doc[USER_MODE_WRITE_KEY].get_bool().value, 
-           bson_doc[USER_MODE_EXEC_KEY].get_bool().value}, 
+  fs::Perm{bson_doc[USER_MODE_READ_KEY].get_bool(),
+           bson_doc[USER_MODE_WRITE_KEY].get_bool(),
+           bson_doc[USER_MODE_EXEC_KEY].get_bool()},
   fs::Perm{
-           bson_doc[GROUP_MODE_READ_KEY].get_bool().value, 
-           bson_doc[GROUP_MODE_WRITE_KEY].get_bool().value, 
-           bson_doc[GROUP_MODE_EXEC_KEY].get_bool().value}, 
-  fs::Perm{bson_doc[UNIV_MODE_READ_KEY].get_bool().value, 
-           bson_doc[UNIV_MODE_WRITE_KEY].get_bool().value, 
-           bson_doc[UNIV_MODE_EXEC_KEY].get_bool().value}
+           bson_doc[GROUP_MODE_READ_KEY].get_bool(),
+           bson_doc[GROUP_MODE_WRITE_KEY].get_bool(),
+           bson_doc[GROUP_MODE_EXEC_KEY].get_bool()},
+  fs::Perm{bson_doc[UNIV_MODE_READ_KEY].get_bool(),
+           bson_doc[UNIV_MODE_WRITE_KEY].get_bool(),
+           bson_doc[UNIV_MODE_EXEC_KEY].get_bool()}
   );
 
-  time_t last_access = bson_doc[LAST_ACCESS_KEY].get_int64().value;
-  time_t last_modify = bson_doc[LAST_MODIFY_KEY].get_int64().value;
-  time_t last_change = bson_doc[LAST_CHANGE_KEY].get_int64().value;
+  time_t last_access = bson_doc[LAST_ACCESS_KEY].get_int64();
+  time_t last_modify = bson_doc[LAST_MODIFY_KEY].get_int64();
+  time_t last_change = bson_doc[LAST_CHANGE_KEY].get_int64();
   
   INODE inode = bson_doc[INODE_KEY].get_int32().value;
-  INODE parent_dir_inode = bson_doc[PARENT_DIR_INODE_KEY].get_int32().value;
+  INODE parent_dir_inode = bson_doc[PARENT_DIR_INODE_KEY].get_int32();
   
-  int uid = bson_doc[UID_KEY].get_int32().value;
-  int gid = bson_doc[GID_KEY].get_int32().value;
+  int uid = bson_doc[UID_KEY].get_int32();
+  int gid = bson_doc[GID_KEY].get_int32();
+
+  int file_size = bson_doc[FILE_SIZE_KEY].get_int32();
+  std::optional<int> final_file_size = std::nullopt;
+
+  if(file_size != -1) {
+    final_file_size = file_size;
+  }
 
   auto entry = FSMetadataCollectionEntry(
     inode,
-    std::string(bson_doc[BASE_NAME_KEY].get_string().value),
-    std::string(bson_doc[FILE_TYPE_KEY].get_string().value),
+    std::string(bson_doc[BASE_NAME_KEY].get_string()),
+    std::string(bson_doc[FILE_TYPE_KEY].get_string()),
     mode,
     time(&last_access),
     time(&last_modify),
     time(&last_change),
     uid,
-    gid
+    gid,
+    final_file_size
   );
 
   entry.set_parent_dir_inode(parent_dir_inode);

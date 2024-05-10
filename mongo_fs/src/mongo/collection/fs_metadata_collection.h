@@ -31,9 +31,9 @@ namespace mongo {
     class FSMetadataCollectionEntry {
       public:
         FSMetadataCollectionEntry(INODE inode, std::string base_name, std::string file_type, fs::Mode mode, time_t last_access,
-                      time_t last_modify, time_t last_change, int uid, int gid) 
+                      time_t last_modify, time_t last_change, int uid, int gid, std::optional<int> file_size)
           : inode{inode}, base_name{base_name}, file_type{file_type}, mode{mode}, last_access{last_access},
-                        last_modify{last_modify}, last_change{last_change}, uid{uid}, gid{gid} {}
+                        last_modify{last_modify}, last_change{last_change}, uid{uid}, gid{gid}, file_size{file_size} {}
         FSMetadataCollectionEntry(const char* _base_name, mode_t _mode, MDFileType file_type);
 
         const mode_t to_mode_t();
@@ -63,6 +63,7 @@ namespace mongo {
         static constexpr std::string_view LAST_CHANGE_KEY = "last_change";
         static constexpr std::string_view UID_KEY = "uid";
         static constexpr std::string_view GID_KEY = "gid";
+        static constexpr std::string_view FILE_SIZE_KEY = "file_size";
 
         INODE inode;
         std::string base_name;
@@ -73,6 +74,7 @@ namespace mongo {
         time_t last_change;
         int uid;
         int gid;
+        std::optional<int> file_size;
       private:
         INODE parent_dir_inode;
     };

@@ -26,6 +26,7 @@ void Manager::init_db() {
     root_fs_dir_stat.st_ctim.tv_sec,
     (int)root_fs_dir_stat.st_uid,
     (int)root_fs_dir_stat.st_gid,
+    std::nullopt
   };
 
   FSMetadataCollection::create_entry_with_dir_parent((INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR, fs_metadata_collection_entry);

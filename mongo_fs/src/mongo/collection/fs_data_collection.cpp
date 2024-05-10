@@ -37,8 +37,8 @@ std::optional<FS_DATA_ID> FSDataCollection::create_entry(INODE inode, FSDataColl
 
 FSDataCollectionEntry FSDataCollectionEntry::bson_to_entry(value bson_doc) {
   return FSDataCollectionEntry {
-    bson_doc[FSDataCollectionEntry::FS_DATA_ID_KEY].get_int32().value,
-    bson_doc[FSDataCollectionEntry::FS_BUF_SIZE_KEY].get_int32().value,
+    bson_doc[FSDataCollectionEntry::FS_DATA_ID_KEY].get_int32(),
+    bson_doc[FSDataCollectionEntry::FS_BUF_SIZE_KEY].get_int32(),
     (char*)bson_doc[FSDataCollectionEntry::FS_BUF_KEY].get_binary().bytes
   };
 }
