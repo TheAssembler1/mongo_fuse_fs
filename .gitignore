@@ -1,2 +1,4 @@
 mnt
 .vscode
+*.output
+

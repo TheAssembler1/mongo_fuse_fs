@@ -263,10 +263,11 @@ int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) 
 int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
   PREHANDLER_PRINT;
 
-  mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, *ffi);
+  auto bytes_written = mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, *ffi);
+  std::cout << "total bytes written: " << bytes_written << std::endl;
 
   POSTHANDLER_PRINT;
-  return FS_OPERATION_SUCCESS;
+  return bytes_written;
 }
 
 int Operations::read_buf(const char* path, fuse_bufvec** f_bvec, size_t size, off_t offset, fuse_file_info* ffi) {

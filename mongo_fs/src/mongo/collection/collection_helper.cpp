@@ -29,7 +29,7 @@ void CollectionHelper::print_all_file(INODE inode) {
   std::cout << std::endl << "end file output" << std::endl;
 }
 
-void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, fuse_file_info& ffi) {
+int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, fuse_file_info& ffi) {
   std::cout << "write blocks to mongo with fuse buffer vector fd: " << ffi.fh << std::endl;
   std::cout << "write blocks to mongo with fuse buffer vector with number of buffers: " << f_bvec.count << std::endl;
   std::cout << "write blocks to mongo with fuse buffer vector with offset: " << f_bvec.off << std::endl;
@@ -45,6 +45,10 @@ void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec&
     std::cout << "seek pointer not set" << std::endl;
   }
 
+  int metadata_file_size = metadata_entry.file_size.value();
+  int file_size_after_write = metadata_file_size;
+  int total_bytes_written = 0;
+
   for(; f_bvec.idx < f_bvec.count; f_bvec.idx++) {
     std::cout << "writing buffer with idx: " << f_bvec.idx << std::endl;
 
@@ -55,9 +59,7 @@ void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec&
     int starting_file_pos = f_buf.pos;
 
     std::cout << "writing buffer with size: " << buf_size << std::endl;
-    std::cout << "starting file position offset: " << starting_file_pos << std::endl;
-
-    int metadata_file_size = metadata_entry.file_size.value();
+    std::cout << "starting file position: " << starting_file_pos << std::endl;
 
     std::cout << "buffer size: " << buf_size << std::endl;
     std::cout << "current position: " << f_buf.pos << std::endl;
@@ -65,7 +67,7 @@ void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec&
     std::cout << "starting file size: " << metadata_file_size << std::endl;
 
     int additional_bytes_needed = f_buf.pos + buf_size - metadata_file_size;
-    int total_bytes_after_write = additional_bytes_needed + metadata_file_size;
+    file_size_after_write += additional_bytes_needed;
     int total_blocks_needed = ((metadata_file_size + additional_bytes_needed) / BLOCK_SIZE) + 1;
     int current_blocks = (metadata_file_size / BLOCK_SIZE) + 1;
     int additional_blocks_needed = total_blocks_needed - current_blocks;
@@ -104,15 +106,15 @@ void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec&
       for(int i = 0; i < bytes_to_write; i++) {
         data_entry.buf[i + block_offset] = ((const char*)f_buf.mem)[f_buf.pos + i];
         FSDataCollection::update_entry(data_entry);
+        f_buf.pos++;
+        total_bytes_written++;
       }
-
-      f_buf.pos += bytes_to_write;
-
-      FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, total_bytes_after_write);
     }
   }
 
   print_all_file(ffi.fh);
+  FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, file_size_after_write);
+  return total_bytes_written;
 }
 
 // FIXME: currently copying bytes over could just point to bson buffers in f bvec...
