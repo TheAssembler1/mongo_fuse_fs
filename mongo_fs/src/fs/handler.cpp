@@ -277,7 +277,7 @@ int Operations::read_buf(const char* path, fuse_bufvec** _f_bvec, size_t size, o
     auto f_bvec = *_f_bvec;
     
     // NOTE: number of buffers
-    f_bvec->count = 10;
+    f_bvec->count = 1;
     f_bvec->idx = 0;
     f_bvec->off = 0;
     
