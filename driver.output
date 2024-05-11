@@ -1,0 +1,10 @@
+Hello driver!
+
+mnt_path: /home/theassembler/src/mongo_fuse_fs/mnt/
+Begin test: file open/close
+abs file path: /home/theassembler/src/mongo_fuse_fs/mnt/test
+Begin action: fopen(test, w+)
+Stop action: fopen(test, w+
+Begin action: fclose(fp)
+Stop action: fclose(fp)
+Succeeded: file open/close

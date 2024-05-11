@@ -269,33 +269,10 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offse
   return FS_OPERATION_SUCCESS;
 }
 
-int Operations::read_buf(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info* ffi) {
-    assert(!path);
-    
-    // FIXME: could be multibuffer read for now assume buffer size of 1
-    *_f_bvec = new fuse_bufvec[sizeof(struct fuse_bufvec) + 1 * sizeof(struct fuse_buf)]();
-    auto f_bvec = *_f_bvec;
-    
-    // NOTE: number of buffers
-    f_bvec->count = 1;
-    f_bvec->idx = 0;
-    f_bvec->off = 0;
-    
-    // NOTE: size of internal buffer
-    f_bvec->buf->size= 10;
-    f_bvec->buf->mem = new char[10]();
-    char* buffer = (char*)f_bvec->buf->mem;
-
-    for(int i = 0; i < f_bvec->count; i++) {
-        buffer[i] = 't';
-    }
-
+int Operations::read_buf(const char* path, fuse_bufvec** f_bvec, size_t size, off_t offset, fuse_file_info* ffi) {
     PREHANDLER_PRINT;
-
-    std::cout << "write_buf called with fd: " << ffi->fh << std::endl;
-    std::cout << "number of buffers: " << f_bvec->count << std::endl;
-    std::cout << "write_buf offset: " << f_bvec->off << std::endl;
     
+    mongo::CollectionHelper::read_mongo_to_fuse_bufvec(path, f_bvec, size, offset, *ffi);
 
     POSTHANDLER_PRINT;
     return FS_OPERATION_SUCCESS;

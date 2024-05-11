@@ -114,3 +114,48 @@ void CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec&
 
   print_all_file(ffi.fh);
 }
+
+// FIXME: currently copying bytes over could just point to bson buffers in f bvec...
+void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info& ffi) {
+    // FIXME: could be multibuffer read for now assume buffer size of 1
+    *_f_bvec = new fuse_bufvec[sizeof(struct fuse_bufvec) + 1 * sizeof(struct fuse_buf)]();
+    auto f_bvec = *_f_bvec;
+
+    // NOTE: number of buffers
+    f_bvec->count = 1;
+    f_bvec->idx = 0;
+    f_bvec->off = 0;
+
+    f_bvec->buf->size = size;
+    f_bvec->buf->mem = new char[size]();
+    char* buf = (char*)f_bvec->buf->mem;
+    int starting_file_pos = offset;
+    int current_file_pos = offset;
+
+    while(current_file_pos - starting_file_pos < size) {
+      int block_offset = current_file_pos % BLOCK_SIZE;
+      int bytes_to_read = 0;
+      int remaining_bytes = size - current_file_pos - starting_file_pos;
+
+      if(remaining_bytes > BLOCK_SIZE) {
+        std::cout << "more block to read after current block" << std::endl;
+        bytes_to_read = BLOCK_SIZE - block_offset;
+      } else {
+        std::cout << "reading remaining bytes" << std::endl;
+        bytes_to_read = remaining_bytes;
+      }
+
+      std::cout << "reading from block offset: " << block_offset << std::endl;
+      std::cout << "reading size in bytes: " << bytes_to_read << std::endl;
+      std::cout << "current file position: " << current_file_pos << std::endl;
+      std::cout << "remaining bytes: " << remaining_bytes << std::endl;
+
+      auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_offset).value();
+      auto data_entry = FSDataCollection::read_entry(lookup_entry.fs_data_id).value();
+
+      for(int i = 0; i < bytes_to_read; i++) {
+        buf[current_file_pos - starting_file_pos] = ((const char*)data_entry.buf)[i + block_offset];
+        current_file_pos++;
+      }
+    }
+}

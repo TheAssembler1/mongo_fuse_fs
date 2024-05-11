@@ -12,3 +12,6 @@ echo "creating db fs_root"
 mongosh --eval "use blog" 
 ./run_mongo_fs.sh
 ./run_driver.sh
+
+echo "watching tail of file output"
+watch -n 1 "tail mongo_fuse_fs.output"

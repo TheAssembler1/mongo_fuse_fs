@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./driver/build/driver $(pwd)/mnt
+./driver/build/driver $(pwd)/mnt &> driver.output

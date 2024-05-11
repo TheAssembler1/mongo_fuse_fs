@@ -1,0 +1,1164 @@
+FS root path: /home/theassembler/src/mongo_fuse_fs
+===================================
+executing function: init handler
+fs init call
+nullpath_ok set to true
+init database
+removingd mnt dir
+succesfully stat root fs dir
+succesfully stat root fs dir
+done executing function: init handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+===================================
+executing function: getattr handler
+getattr path /BDMV
+getattr null ffi
+ffi null searching by path: /BDMV
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+parsing path: /BDMV into components
+fs root dir was specified by path
+succesfully stat root fs dirsuccesfully stat root fs dir
+
+done executing function: getattr handler
+===================================
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /.xdg-volume-info
+getattr null ffi
+ffi null searching by path: /.xdg-volume-info
+parsing path: /.xdg-volume-info into components
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+done executing function: getattr handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /autorun.inf
+getattr null ffi
+ffi null searching by path: /autorun.inf
+parsing path: /autorun.inf into components
+succesfully stat root fs dir
+done executing function: getattr handler
+===================================
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /autorun.inf
+getattr null ffi
+ffi null searching by path: /autorun.inf
+parsing path: /autorun.inf into components
+succesfully stat root fs dir
+done executing function: getattr handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+done executing function: readdir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+done executing function: getattr handler
+===================================
+===================================
+executing function: create handler
+getattr non_null ffi: 0
+parsing path: /test into components
+succesfully stat root fs dir
+creating entry for fs_data_collection
+done executing function: create handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr non_null ffi: 0
+ffi not null searching by fd: 0
+done executing function: getattr handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: utimens handler
+done executing function: utimens handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: O_WRONLY ===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: write_buf handler
+write blocks to mongo with fuse buffer vector fd: 1594649418
+write blocks to mongo with fuse buffer vector with number of buffers: 1
+write blocks to mongo with fuse buffer vector with offset: 0
+seek pointer set
+writing buffer with idx: 0
+writing buffer with size: 5
+starting file position offset: 0
+buffer size: 5
+current position: 0
+starting position: 0
+starting file size: 0
+current blocks: 1
+total blocks needed: 1
+-------------------------------------------------------
+writing remaining bytes
+writing to block offset: 0
+writing size in bytes: 5
+current file position: 0
+remaining bytes: 5
+read all blocks for inode: 1594649418
+number of blocks found: 1
+file output: 
+test
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+end file output
+done executing function: write_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: 
+done executing function: open handler
+===================================
+===================================
+executing function: read_buf handler
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 0
+remaining bytes: 4096
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 512
+remaining bytes: 3584
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1024
+remaining bytes: 3072
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1536
+remaining bytes: 2560
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2048
+remaining bytes: 2048
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2560
+remaining bytes: 1536
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3072
+remaining bytes: 1024
+reading remaining bytes
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3584
+remaining bytes: 512
+done executing function: read_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: O_WRONLY ===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: write_buf handler
+write blocks to mongo with fuse buffer vector fd: 1594649418
+write blocks to mongo with fuse buffer vector with number of buffers: 1
+write blocks to mongo with fuse buffer vector with offset: 0
+seek pointer set
+writing buffer with idx: 0
+writing buffer with size: 15
+starting file position offset: 0
+buffer size: 15
+current position: 0
+starting position: 0
+starting file size: 5
+current blocks: 1
+total blocks needed: 1
+-------------------------------------------------------
+writing remaining bytes
+writing to block offset: 0
+writing size in bytes: 15
+current file position: 0
+remaining bytes: 15
+read all blocks for inode: 1594649418
+number of blocks found: 1
+file output: 
+test/test/test
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+end file output
+done executing function: write_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: 
+done executing function: open handler
+===================================
+===================================
+executing function: read_buf handler
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 0
+remaining bytes: 4096
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 512
+remaining bytes: 3584
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1024
+remaining bytes: 3072
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1536
+remaining bytes: 2560
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2048
+remaining bytes: 2048
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2560
+remaining bytes: 1536
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3072
+remaining bytes: 1024
+reading remaining bytes
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3584
+remaining bytes: 512
+done executing function: read_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: O_WRONLY ===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: write_buf handler
+write blocks to mongo with fuse buffer vector fd: 1594649418
+write blocks to mongo with fuse buffer vector with number of buffers: 1
+write blocks to mongo with fuse buffer vector with offset: 0
+seek pointer set
+writing buffer with idx: 0
+writing buffer with size: 17
+starting file position offset: 0
+buffer size: 17
+current position: 0
+starting position: 0
+starting file size: 15
+current blocks: 1
+total blocks needed: 1
+-------------------------------------------------------
+writing remaining bytes
+writing to block offset: 0
+writing size in bytes: 17
+current file position: 0
+remaining bytes: 17
+read all blocks for inode: 1594649418
+number of blocks found: 1
+file output: 
+test/test/test\n
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+end file output
+done executing function: write_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: open handler
+open called with path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+found doc with fd: 1594649418
+file opened with the following flags: 
+done executing function: open handler
+===================================
+===================================
+executing function: read_buf handler
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 0
+remaining bytes: 4096
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 512
+remaining bytes: 3584
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1024
+remaining bytes: 3072
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 1536
+remaining bytes: 2560
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2048
+remaining bytes: 2048
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 2560
+remaining bytes: 1536
+more block to read after current block
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3072
+remaining bytes: 1024
+reading remaining bytes
+reading from block offset: 0
+reading size in bytes: 512
+current file position: 3584
+remaining bytes: 512
+done executing function: read_buf handler
+===================================
+===================================
+executing function: flush handler
+done executing function: flush handler
+===================================
+===================================
+executing function: lock handler
+done executing function: lock handler
+===================================
+===================================
+executing function: release handler
+done executing function: release handler
+===================================
+===================================
+executing function: opendir handler
+opendir called with path: /
+parsing path: / into components
+path components vector of size 1: /
+fs root dir specified by reach_parent_inode
+fs root dir was specified by path
+succesfully stat root fs dir
+setting ffi fd: 7995600
+done executing function: opendir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: readdir handler
+readdir called with fd: 7995600
+test
+done executing function: readdir handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /test
+getattr null ffi
+ffi null searching by path: /test
+parsing path: /test into components
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: access handler
+done executing function: access handler
+===================================
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
+===================================
+executing function: getattr handler
+getattr path /
+getattr null ffi
+succesfully stat root fs dir
