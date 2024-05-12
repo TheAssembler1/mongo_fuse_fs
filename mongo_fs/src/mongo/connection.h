@@ -20,15 +20,13 @@
 #define GET_FS_LOOKUP_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSLookupCollection::NAME]
 // NOTE: holds all data blocks for files in fs
 #define GET_FS_DATA_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDataCollection::NAME]
-// NOTE: maps dir inodes to file/dir inodes
-#define GET_FS_DIR_COLLECTION(conn) GET_ROOT_DB(conn)[mongo::FSDirCollection::NAME]
 
 namespace mongo {
 
   class Connection {
     public:
       Connection() : uri{DB_URI}, client{uri} {}
-      const mongocxx::client& get_client() const { return client; };
+      const mongocxx::client& get_client() const { return client; }
       
     private:
       const mongocxx::uri uri;

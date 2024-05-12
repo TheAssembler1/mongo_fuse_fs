@@ -3,9 +3,11 @@
 #define FS_OPERATION_FAIL 1
 #define FS_OPERATION_SUCCESS 0
 
+#define NOT_IMPLEMENTED_WARNING std::cout << "WARNING: method " << __FUNCTION__ << " not implemented!" << std::endl
 #define PREHANDLER_PRINT std::cout << "===================================" << std::endl << "executing function: " << __FUNCTION__ << " handler" << std::endl
 #define POSTHANDLER_PRINT std::cout << "done executing function: " << __FUNCTION__ << " handler" << std::endl << "===================================" << std::endl
-#define U {PREHANDLER_PRINT; POSTHANDLER_PRINT; return FS_OPERATION_SUCCESS;}
+#define U { PREHANDLER_PRINT; NOT_IMPLEMENTED_WARNING; POSTHANDLER_PRINT; return FS_OPERATION_SUCCESS; }
+#define U_VOID { PREHANDLER_PRINT; NOT_IMPLEMENTED_WARNING; POSTHANDLER_PRINT; }
 
 using namespace fs;
 
@@ -59,7 +61,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     mongo::FSMetadataCollectionEntry md_entry = md_entry_opt.value();
     stat->st_ino = md_entry.inode;
     stat->st_mode = md_entry.to_mode_t();
-    stat->st_size = 10;
+    stat->st_size = md_entry.file_size.value();
     stat->st_gid = md_entry.gid;
     stat->st_uid = md_entry.uid;
     stat->st_atim = std::timespec{md_entry.last_access, 0};
@@ -74,9 +76,6 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
   return -ENOENT;
 }
 
-int Operations::readlink(const char*, char*, size_t) U;
-int Operations::mknod(const char*, mode_t, dev_t) U; 
-
 // FIXME: check file doesn't already exists and permissions etc.
 int Operations::mkdir(const char* path, mode_t mode)  {
   PREHANDLER_PRINT;
@@ -88,15 +87,6 @@ int Operations::mkdir(const char* path, mode_t mode)  {
 
   return FS_OPERATION_SUCCESS;
 }
-
-int Operations::unlink(const char*) U;
-int Operations::rmdir(const char*) U;
-int Operations::symlink(const char*, const char*) U;
-int Operations::rename(const char*, const char*, unsigned int) U;
-int Operations::link(const char*, const char*) U;
-int Operations::chmod(const char*, mode_t, fuse_file_info*) U;
-int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U;
-int Operations::truncate(const char*, off_t, fuse_file_info*) U;
 
 int Operations::open(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
@@ -139,43 +129,7 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
   POSTHANDLER_PRINT;
 
   return FS_OPERATION_SUCCESS;
-};
-
-int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) {
-  PREHANDLER_PRINT;
-
-  /*std::cout << "read called with fd: " << ffi->fh << std::endl;
-
-  std::optional<mongo::FSMetadataCollectionEntry> md_entry_opt =  mongo::FSMetadataCollection::search_by_inode(ffi->fh);
-
-  if(!md_entry_opt.has_value()) {
-    return -EBADF;
-  }
-
-  mongo::FSMetadataCollectionEntry md_entry = md_entry_opt.value();
-
-  if(md_entry.file_type == mongo::FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE) {
-   return -EISDIR;  
-  }
-
-  std::vector<mongo::FSDataCollectionEntry> fs_data_collection_entires = mongo::FSDataCollection::read_all_fs_data_blocks(ffi->fh);
-  POSTHANDLER_PRINT;*/
-
-  return FS_OPERATION_SUCCESS;
 }
-
-int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U;
-int Operations::statfs(const char*, struct statvfs*) U;
-int Operations::flush(const char*, fuse_file_info*) U;
-int Operations::release(const char*, fuse_file_info*) U;
-int Operations::fsync(const char*, int, fuse_file_info*) U;
-
-#ifdef HAVE_SETXATTR
-int Operations::setxattr(const char*, const char*, const char*, size_t, int) U;
-int Operations::getxattr(const char* path, const char* name, char* value, size_t size) U;
-int Operations::listxattr(const char*, char*, size_t) U;
-int Operations::removexattr(const char*, const char*) U;
-#endif
 
 int Operations::opendir(const char* path, fuse_file_info* ffi) {
   PREHANDLER_PRINT;
@@ -227,9 +181,6 @@ int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, of
   return FS_OPERATION_SUCCESS;
 }
 
-int Operations::releasedir(const char*, fuse_file_info*) U;
-int Operations::fsyncdir(const char*, int, fuse_file_info*) U;
-
 void* Operations::init(fuse_conn_info*, fuse_config* fg) {
   PREHANDLER_PRINT;
 
@@ -245,25 +196,12 @@ void* Operations::init(fuse_conn_info*, fuse_config* fg) {
   return nullptr;
 }
 
-void Operations::destroy(void*) {}; 
-int Operations::access(const char*, int) U;
-
-int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U;
-
-int Operations::utimens(const char* path, const timespec*, fuse_file_info*) {
-  PREHANDLER_PRINT;
-  POSTHANDLER_PRINT;
-  return FS_OPERATION_SUCCESS;
-}
-
-int Operations::bmap(const char*, size_t, uint64_t*) U;
-int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigned int, void*) U;
-int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U;
-
-int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t buf_offset, fuse_file_info* ffi)  {
+int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t offset, fuse_file_info* ffi)  {
   PREHANDLER_PRINT;
 
-  auto bytes_written = mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, *ffi);
+  std::cout << "buf_offset: " << offset << std::endl;
+
+  auto bytes_written = mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, offset, *ffi);
   std::cout << "total bytes written: " << bytes_written << std::endl;
 
   POSTHANDLER_PRINT;
@@ -279,7 +217,39 @@ int Operations::read_buf(const char* path, fuse_bufvec** f_bvec, size_t size, of
     return FS_OPERATION_SUCCESS;
 }
 
-int Operations::flock(const char*, fuse_file_info*, int) U;
-int Operations::fallocate(const char*, int, off_t, off_t, fuse_file_info*) U;
-ssize_t Operations::copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int) U;
-off_t Operations::lseek(const char*, off_t, int, fuse_file_info*) U;
+
+int Operations::utimens(const char* path, const timespec*, fuse_file_info*) U
+int Operations::readlink(const char*, char*, size_t) U
+int Operations::mknod(const char*, mode_t, dev_t) U
+int Operations::unlink(const char*) U
+int Operations::rmdir(const char*) U
+int Operations::symlink(const char*, const char*) U
+int Operations::rename(const char*, const char*, unsigned int) U
+int Operations::link(const char*, const char*) U
+int Operations::chmod(const char*, mode_t, fuse_file_info*) U
+int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U
+int Operations::truncate(const char*, off_t, fuse_file_info*) U
+int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) U
+int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U
+int Operations::statfs(const char*, struct statvfs*) U
+int Operations::flush(const char*, fuse_file_info*) U
+int Operations::release(const char*, fuse_file_info*) U
+int Operations::fsync(const char*, int, fuse_file_info*) U
+#ifdef HAVE_SETXATTR
+int Operations::setxattr(const char*, const char*, const char*, size_t, int) U;
+int Operations::getxattr(const char* path, const char* name, char* value, size_t size) U;
+int Operations::listxattr(const char*, char*, size_t) U;
+int Operations::removexattr(const char*, const char*) U;
+#endif
+int Operations::releasedir(const char*, fuse_file_info*) U
+int Operations::fsyncdir(const char*, int, fuse_file_info*) U
+void Operations::destroy(void*) U_VOID
+int Operations::access(const char*, int) U
+int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U
+int Operations::bmap(const char*, size_t, uint64_t*) U
+int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigned int, void*) U
+int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U
+int Operations::flock(const char*, fuse_file_info*, int) U
+int Operations::fallocate(const char*, int, off_t, off_t, fuse_file_info*) U
+ssize_t Operations::copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int) U
+off_t Operations::lseek(const char*, off_t, int, fuse_file_info*) U

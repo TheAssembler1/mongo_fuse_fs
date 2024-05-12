@@ -5,6 +5,7 @@ using namespace mongo;
 void CollectionHelper::create_next_data_lookup_entries(INODE inode) {
   FSDataCollectionEntry data_entry{};
   auto data_entry_id = FSDataCollection::create_entry(data_entry).value();
+
   FSLookupCollectionEntry lookup_entry{inode, data_entry_id};
   FSLookupCollection::create_next_entry(lookup_entry);
 }
@@ -29,97 +30,81 @@ void CollectionHelper::print_all_file(INODE inode) {
   std::cout << std::endl << "end file output" << std::endl;
 }
 
-int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, fuse_file_info& ffi) {
-  std::cout << "write blocks to mongo with fuse buffer vector fd: " << ffi.fh << std::endl;
-  std::cout << "write blocks to mongo with fuse buffer vector with number of buffers: " << f_bvec.count << std::endl;
-  std::cout << "write blocks to mongo with fuse buffer vector with offset: " << f_bvec.off << std::endl;
+int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, off_t offset, fuse_file_info& ffi) {
+  assert(f_bvec.off == 0);
 
   // NOTE: gettting metadata for file
   auto metadata_entry = FSMetadataCollection::search_by_inode(ffi.fh).value();
 
-  assert(f_bvec.off == 0);
-
-  if(FUSE_BUF_FD_SEEK) {
-    std::cout << "seek pointer set" << std::endl;
-  } else {
-    std::cout << "seek pointer not set" << std::endl;
-  }
-
-  int metadata_file_size = metadata_entry.file_size.value();
-  int file_size_after_write = metadata_file_size;
+  int cur_file_size = metadata_entry.file_size.value();
   int total_bytes_written = 0;
 
   for(; f_bvec.idx < f_bvec.count; f_bvec.idx++) {
-    std::cout << "writing buffer with idx: " << f_bvec.idx << std::endl;
-
     fuse_buf f_buf = f_bvec.buf[f_bvec.idx];
     assert(f_buf.fd == 0);
 
+    int cur_blocks = (cur_file_size / BLOCK_SIZE) + 1;
+    int starting_fp = offset;
+    int cur_fp = starting_fp;
     int buf_size = f_buf.size;
-    int starting_file_pos = f_buf.pos;
 
-    std::cout << "writing buffer with size: " << buf_size << std::endl;
-    std::cout << "starting file position: " << starting_file_pos << std::endl;
+    // NOTE: check if we need more blocks
+    int additional_blocks_needed = 0;
+    if(offset + f_buf.size > cur_file_size) {
+        int blocks_needed = ((offset + f_buf.size) / BLOCK_SIZE) + 1;
+        additional_blocks_needed = blocks_needed - cur_blocks;
 
-    std::cout << "buffer size: " << buf_size << std::endl;
-    std::cout << "current position: " << f_buf.pos << std::endl;
-    std::cout << "starting position: " << starting_file_pos << std::endl;
-    std::cout << "starting file size: " << metadata_file_size << std::endl;
+        // NOTE: increase cur_file_size for potential next iteration
+        cur_file_size += offset + f_buf.size - cur_file_size;
 
-    int additional_bytes_needed = f_buf.pos + buf_size - metadata_file_size;
-    file_size_after_write += additional_bytes_needed;
-    int total_blocks_needed = ((metadata_file_size + additional_bytes_needed) / BLOCK_SIZE) + 1;
-    int current_blocks = (metadata_file_size / BLOCK_SIZE) + 1;
-    int additional_blocks_needed = total_blocks_needed - current_blocks;
+        std::cout << "creating " << additional_blocks_needed << " additional blocks" << std::endl;
 
-    std::cout << "current blocks: " << current_blocks << std::endl;
-    std::cout << "total blocks needed: " << total_blocks_needed << std::endl;;
-
-    // NOTE: creating lookup and data entriescreate_next_data_lookup_entries
-    for(int i = 0; i < additional_blocks_needed; i++) {
-      create_next_data_lookup_entries((INODE)ffi.fh);
+        // NOTE: creating lookup and data entriescreate_next_data_lookup_entries
+        for(int i = 0; i < additional_blocks_needed; i++) {
+          create_next_data_lookup_entries((INODE)ffi.fh);
+        }
     }
 
-    std::cout << "-------------------------------------------------------" << std::endl;
+    while(cur_fp - starting_fp < buf_size) {
+      int block_order = cur_fp / BLOCK_SIZE;
 
-    while(f_buf.pos - starting_file_pos < buf_size) {
-      int block_offset = f_buf.pos % BLOCK_SIZE;
-      int bytes_to_write = 0;
-      int remaining_bytes = buf_size - f_buf.pos - starting_file_pos;
-
-      if(remaining_bytes > BLOCK_SIZE) {
-        std::cout << "more block to write after current block" << std::endl;
-        bytes_to_write = BLOCK_SIZE - block_offset;
-      } else {
-        std::cout << "writing remaining bytes" << std::endl;
-        bytes_to_write = remaining_bytes;
-      }
-
-      std::cout << "writing to block offset: " << block_offset << std::endl;
-      std::cout << "writing size in bytes: " << bytes_to_write << std::endl;
-      std::cout << "current file position: " << f_buf.pos << std::endl;
-      std::cout << "remaining bytes: " << remaining_bytes << std::endl;
-
-      auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_offset).value();
+      std::cout << "writing block with order: " << block_order << std::endl;
+      auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_order).value();
+      std::cout << "writing block with fs data id: " << lookup_entry.fs_data_id << std::endl;
       auto data_entry = FSDataCollection::read_entry(lookup_entry.fs_data_id).value();
 
-      for(int i = 0; i < bytes_to_write; i++) {
-        data_entry.buf[i + block_offset] = ((const char*)f_buf.mem)[f_buf.pos + i];
-        FSDataCollection::update_entry(data_entry);
-        f_buf.pos++;
+      // NOTE: start at current position within block based on FP
+      for(int pos_in_block = cur_fp % BLOCK_SIZE; pos_in_block < BLOCK_SIZE;) {
+        // NOTE: ensuring we don't overwite in cur block
+        if(cur_fp - starting_fp >= buf_size) {
+            break;
+        }
+
+        // NOTE: read buffer into mongon buffer
+        data_entry.buf[pos_in_block] = ((const char*)f_buf.mem)[cur_fp - starting_fp];
+
+        // NOTE: updating pos and total bytes written
         total_bytes_written++;
+        cur_fp++;
+        pos_in_block++;
       }
+
+      // NOTE: update data entry with new data
+      FSDataCollection::update_entry(data_entry);
     }
   }
 
-  print_all_file(ffi.fh);
-  FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, file_size_after_write);
+  FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, cur_file_size);
   return total_bytes_written;
 }
 
 // FIXME: currently copying bytes over could just point to bson buffers in f bvec...
 void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info& ffi) {
-    // FIXME: could be multibuffer read for now assume buffer size of 1
+    // NOTE: gettting metadata for file
+    auto metadata_entry = FSMetadataCollection::search_by_inode(ffi.fh).value();
+
+    std::cout << "num bytes requested: " << size << std::endl;
+
     *_f_bvec = new fuse_bufvec[sizeof(struct fuse_bufvec) + 1 * sizeof(struct fuse_buf)]();
     auto f_bvec = *_f_bvec;
 
@@ -130,34 +115,35 @@ void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec**
 
     f_bvec->buf->size = size;
     f_bvec->buf->mem = new char[size]();
+
     char* buf = (char*)f_bvec->buf->mem;
-    int starting_file_pos = offset;
-    int current_file_pos = offset;
 
-    while(current_file_pos - starting_file_pos < size) {
-      int block_offset = current_file_pos % BLOCK_SIZE;
-      int bytes_to_read = 0;
-      int remaining_bytes = size - current_file_pos - starting_file_pos;
+    int file_size = metadata_entry.file_size.value();
+    int starting_fp = offset;
+    int cur_fp = starting_fp;
+    int buf_size = size;
 
-      if(remaining_bytes > BLOCK_SIZE) {
-        std::cout << "more block to read after current block" << std::endl;
-        bytes_to_read = BLOCK_SIZE - block_offset;
-      } else {
-        std::cout << "reading remaining bytes" << std::endl;
-        bytes_to_read = remaining_bytes;
-      }
+    while(cur_fp - starting_fp < buf_size) {
+      int block_order = cur_fp / BLOCK_SIZE;
 
-      std::cout << "reading from block offset: " << block_offset << std::endl;
-      std::cout << "reading size in bytes: " << bytes_to_read << std::endl;
-      std::cout << "current file position: " << current_file_pos << std::endl;
-      std::cout << "remaining bytes: " << remaining_bytes << std::endl;
-
-      auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_offset).value();
+      std::cout << "current fp: " << cur_fp << std::endl;
+      std::cout << "reading block with order: " << block_order << std::endl;
+      auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_order).value();
+      std::cout << "reading block with fs data id: " << lookup_entry.fs_data_id << std::endl;
       auto data_entry = FSDataCollection::read_entry(lookup_entry.fs_data_id).value();
 
-      for(int i = 0; i < bytes_to_read; i++) {
-        buf[current_file_pos - starting_file_pos] = ((const char*)data_entry.buf)[i + block_offset];
-        current_file_pos++;
+      // NOTE: start at current position within block based on FP
+      for(int pos_in_block = cur_fp % BLOCK_SIZE; pos_in_block < BLOCK_SIZE;) {
+        // NOTE: ensuring we don't overread in cur block
+        if(cur_fp - starting_fp >= buf_size || cur_fp >= file_size) {
+            return;
+        }
+
+        buf[cur_fp - starting_fp] = data_entry.buf[pos_in_block];
+
+        // NOTE: updating pos and total bytes read
+        cur_fp++;
+        pos_in_block++;
       }
     }
 }

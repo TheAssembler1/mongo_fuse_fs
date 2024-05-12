@@ -16,22 +16,22 @@ FSLookupCollectionEntry FSLookupCollectionEntry::bson_to_entry(value bson_doc) {
 }
 
 std::optional<int> FSLookupCollection::get_max_order() {
-  Connection conn; 
+    Connection conn;
 
-  auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
+    auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
-  auto query_pipeline = mongocxx::pipeline();
-  query_pipeline.sort(make_document(kvp(FSLookupCollectionEntry::ORDER_KEY, MONGO_DESC_ORDER)));
-  query_pipeline.limit(1);
+    auto query_pipeline = mongocxx::pipeline();
+    query_pipeline.sort(make_document(kvp(FSLookupCollectionEntry::ORDER_KEY, MONGO_DESC_ORDER)));
+    query_pipeline.limit(1);
 
-  auto cursor = fs_blocks_collection.aggregate(query_pipeline);
-  auto prev_max_fs_lookup_block = *(cursor.begin());
+    auto cursor = fs_blocks_collection.aggregate(query_pipeline);
+    auto prev_max_fs_lookup_block = *(cursor.begin());
 
-  if(prev_max_fs_lookup_block.empty()) {
-    return std::nullopt;
-  }
+    if(prev_max_fs_lookup_block.empty()) {
+      return std::nullopt;
+    }
 
-  return prev_max_fs_lookup_block[FSLookupCollectionEntry::INODE_KEY].get_int32() + 1;
+    return prev_max_fs_lookup_block[FSLookupCollectionEntry::ORDER_KEY].get_int32() + 1;
 }
 
 std::optional<int> FSLookupCollection::create_next_entry(FSLookupCollectionEntry& fs_lookup_collection_entry) {
