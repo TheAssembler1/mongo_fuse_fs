@@ -36,7 +36,8 @@ set(SOURCES
 
 # Create executable
 add_executable(${PROJECT_NAME} ${SOURCES}
-    src/fs/fs_config.h)
+    src/fs/fs_config.h
+    src/.cmake-format)
 
 # Include FUSE headers
 target_include_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_HEADERS}")

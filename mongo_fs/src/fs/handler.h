@@ -4,18 +4,18 @@
 #include <iostream>
 
 #include "../mongo/collection/collection_helper.h"
-#include "../mongo/collection/fs_lookup_collection.h"
 #include "../mongo/collection/fs_data_collection.h"
+#include "../mongo/collection/fs_lookup_collection.h"
 #include "../mongo/collection/fs_metadata_collection.h"
 #include "../mongo/mongo_manager.h"
 #include "fs_helper.h"
 
 namespace fs {
-  
-  class Operations {
+
+class Operations {
     static int getattr(const char* path, struct stat* stat, fuse_file_info* fuse_file_info);
     static int readlink(const char*, char*, size_t);
-    static int mknod(const char*, mode_t, dev_t); 
+    static int mknod(const char*, mode_t, dev_t);
     static int mkdir(const char*, mode_t);
     static int unlink(const char*);
     static int rmdir(const char*);
@@ -32,14 +32,19 @@ namespace fs {
     static int flush(const char*, fuse_file_info*);
     static int release(const char*, fuse_file_info*);
     static int fsync(const char*, int, fuse_file_info*);
-    #if HAVE_SETXATTR
+#if HAVE_SETXATTR
     static int setxattr(const char*, const char*, const char*, size_t, int);
     static int getxattr(const char*, const char*, char*, size_t);
     static int listxattr(const char*, char*, size_t);
     static int removexattr(const char*, const char*);
-    #endif
+#endif
     static int opendir(const char* path, fuse_file_info*);
-    static int readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf);
+    static int readdir(const char* path,
+    void* data,
+    fuse_fill_dir_t filler,
+    off_t offset,
+    fuse_file_info* ffi,
+    fuse_readdir_flags fdf);
     static int releasedir(const char*, fuse_file_info*);
     static int fsyncdir(const char*, int, fuse_file_info*);
     static void* init(fuse_conn_info*, fuse_config*);
@@ -55,63 +60,60 @@ namespace fs {
     static int read_buf(const char*, fuse_bufvec**, size_t, off_t, fuse_file_info*);
     static int flock(const char*, fuse_file_info*, int);
     static int fallocate(const char*, int, off_t, off_t, fuse_file_info*);
-    static ssize_t copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int);
+    static ssize_t
+    copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int);
     static off_t lseek(const char*, off_t, int, fuse_file_info*);
-    
+
     public:
-      static constexpr struct fuse_operations mongo_fuse_fs_callbacks = {
-        .getattr = getattr,
-        .readlink = readlink,
-        .mknod = mknod,
-        .mkdir = mkdir,
-        .unlink = unlink,
-        .rmdir = rmdir,
-        .symlink = symlink,
-        .rename = rename,
-        .link = link,
-        .chmod = chmod,
-        .chown = chown,
-        .truncate = truncate,
-        .open = open,
-        .read = read,
-        .write = write,
-        .statfs = statfs,
-        .flush = flush,
-        .release = release,
-        .fsync = fsync,
-        #ifdef HAVE_SETXATTR
-        .setxattr = setxattr,
-        .getxattr = getxattr,
-        .listxattr = listxattr,
-        .removexattr = removexattr,
-        #endif
-        .opendir = opendir,
-        .readdir = readdir,
-        .fsyncdir = fsyncdir,
-        .init = init,
-        .destroy = destroy,
-        .access = access,
-        .create = create,
-        .lock = lock,
-        .utimens = utimens,
-        .bmap = bmap,
-        .ioctl = ioctl,
-        .poll = poll,
-        .write_buf = write_buf,
-        .read_buf = read_buf,
-        .flock = flock,
-        .fallocate = fallocate,
-      };
+    static constexpr struct fuse_operations mongo_fuse_fs_callbacks = {
+    .getattr  = getattr,
+    .readlink = readlink,
+    .mknod    = mknod,
+    .mkdir    = mkdir,
+    .unlink   = unlink,
+    .rmdir    = rmdir,
+    .symlink  = symlink,
+    .rename   = rename,
+    .link     = link,
+    .chmod    = chmod,
+    .chown    = chown,
+    .truncate = truncate,
+    .open     = open,
+    .read     = read,
+    .write    = write,
+    .statfs   = statfs,
+    .flush    = flush,
+    .release  = release,
+    .fsync    = fsync,
+#ifdef HAVE_SETXATTR
+    .setxattr    = setxattr,
+    .getxattr    = getxattr,
+    .listxattr   = listxattr,
+    .removexattr = removexattr,
+#endif
+    .opendir   = opendir,
+    .readdir   = readdir,
+    .fsyncdir  = fsyncdir,
+    .init      = init,
+    .destroy   = destroy,
+    .access    = access,
+    .create    = create,
+    .lock      = lock,
+    .utimens   = utimens,
+    .bmap      = bmap,
+    .ioctl     = ioctl,
+    .poll      = poll,
+    .write_buf = write_buf,
+    .read_buf  = read_buf,
+    .flock     = flock,
+    .fallocate = fallocate,
+    };
 
-
-      static constexpr struct fuse_config mongo_fuse_fs_config  {
-        .use_ino = true,
-        .nullpath_ok = true,
-      };
-  };
-
+    static constexpr struct fuse_config mongo_fuse_fs_config {
+        .use_ino = true, .nullpath_ok = true,
+    };
 };
 
+}; // namespace fs
+
 #endif
-
-
