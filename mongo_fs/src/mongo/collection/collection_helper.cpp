@@ -10,6 +10,14 @@ void CollectionHelper::create_next_data_lookup_entries(INODE inode) {
     FSLookupCollection::create_next_entry(lookup_entry);
 }
 
+void CollectionHelper::remove_data_lookup_entries_above(INODE inode, int above_order) {
+  auto ids = FSLookupCollection::remove_above_order(inode, above_order);
+
+  for(auto id: ids) {
+    FSDataCollection::remove_entry(id);
+  }
+}
+
 void CollectionHelper::print_all_file(INODE inode) {
     std::cout << "read all blocks for inode: " << inode << std::endl;
 
@@ -147,7 +155,7 @@ void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec**
     }
 }
 
-static void truncate_file(INODE inode, off_t new_size) {
+void CollectionHelper::truncate_file(INODE inode, off_t new_size) {
     auto metadata_entry = FSMetadataCollection::search_by_inode(inode).value();
 
     if(metadata_entry.file_size.value() == new_size) {
@@ -162,16 +170,15 @@ static void truncate_file(INODE inode, off_t new_size) {
         std::cout << "block size larger with truncate" << std::endl;
 
         for(int i = 0; i < new_block_size - cur_blocks; i++) {
-            create_next_data_lookup_entries((INODE)ffi.fh);
+            create_next_data_lookup_entries(inode);
         }
     } else if(new_block_size > cur_blocks) {
         std::cout << "block size smaller with truncate" << std::endl;
-        // FIXME: implement decreasing truncation with removing blocks
-        throw std::runtime_error("ERROR: decreasing trunk size requiring deleted blocks not implemented");
+        remove_data_lookup_entries_above(inode, new_block_size + 1);
     } else {
         std::cout << "block size unchanged with truncate" << std::endl;
     }
 
     std::cout << "updating file size: " << new_size << std::endl;
-    FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, new_size);
+    FSMetadataCollection::update_md_entry_size(inode, new_size);
 }

@@ -41,9 +41,9 @@ FSDataCollectionEntry FSDataCollectionEntry::bson_to_entry(value bson_doc) {
 
 std::optional<FSDataCollectionEntry> FSDataCollection::read_entry(FS_DATA_ID fs_id) {
     Connection conn;
-    auto file_collection = GET_FS_DATA_COLLECTION(&conn);
+    auto data_collection = GET_FS_DATA_COLLECTION(&conn);
 
-    auto bson_res = file_collection.find_one(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, fs_id)));
+    auto bson_res = data_collection.find_one(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, fs_id)));
 
     assert(bson_res);
 
@@ -53,4 +53,10 @@ std::optional<FSDataCollectionEntry> FSDataCollection::read_entry(FS_DATA_ID fs_
 
     auto bson_doc = bson_res.value();
     return FSDataCollectionEntry::bson_to_entry(bson_doc);
+}
+
+void FSDataCollection::remove_entry(FS_DATA_ID fs_data_id) {
+  Connection conn;
+  auto data_collection = GET_FS_DATA_COLLECTION(&conn);
+  data_collection.delete_one(make_document(kvp(FSDataCollectionEntry::FS_DATA_ID_KEY, fs_data_id)));
 }

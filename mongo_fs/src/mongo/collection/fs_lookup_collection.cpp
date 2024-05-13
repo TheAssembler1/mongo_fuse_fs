@@ -89,3 +89,26 @@ std::vector<FS_DATA_ID> FSLookupCollection::get_fs_data_ids(INODE inode) {
 
     return result_vec;
 }
+
+std::vector<FS_DATA_ID> FSLookupCollection::remove_above_order(INODE inode, int above_order) {
+   Connection conn;
+   auto collection = GET_FS_LOOKUP_COLLECTION(&conn);
+
+   auto query = make_document(
+            kvp(FSLookupCollectionEntry::INODE_KEY, inode),
+            kvp("$gte", make_document(
+                  kvp(FSLookupCollectionEntry::ORDER_KEY, above_order)
+            ))
+         );
+   auto res_ids_bson = collection.find(query.view());
+   auto res = collection.delete_many(query.view());
+
+   std::vector<FS_DATA_ID> fs_data_ids{};
+
+   for(const auto& entry: res_ids_bson) {
+      auto id = entry[FSLookupCollectionEntry::DATA_BLOCK_ID_KEY].get_int32();
+      fs_data_ids.push_back(id);
+   }
+
+   return fs_data_ids;
+}

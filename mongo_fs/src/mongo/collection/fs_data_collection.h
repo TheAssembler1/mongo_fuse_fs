@@ -53,6 +53,7 @@ class FSDataCollection {
     static std::optional<FS_DATA_ID> create_entry(FSDataCollectionEntry& fs_data_collection_entry);
     static std::optional<FSDataCollectionEntry> read_entry(FS_DATA_ID fs_data_id);
     static void update_entry(FSDataCollectionEntry& fs_data_collection_entry);
+    static void remove_entry(FS_DATA_ID fs_data_id);
 
     static constexpr std::string_view NAME = "fs_data";
 };
