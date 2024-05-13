@@ -11,15 +11,12 @@ void MongoManager::init_db() {
 
     struct stat root_fs_dir_stat = fs::FSHelper::get_stat_of_root_fs();
     fs::Mode mode{root_fs_dir_stat.st_mode};
-    FSMetadataCollectionEntry fs_metadata_collection_entry{
-    (INODE)root_fs_dir_stat.st_ino, std::string("/"),
-    std::string{FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE}, mode,
-    root_fs_dir_stat.st_atim.tv_sec, root_fs_dir_stat.st_mtim.tv_sec,
-    root_fs_dir_stat.st_ctim.tv_sec, (int)root_fs_dir_stat.st_uid,
+    FSMetadataCollectionEntry fs_metadata_collection_entry{(INODE)root_fs_dir_stat.st_ino, std::string("/"),
+    std::string{FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE}, mode, root_fs_dir_stat.st_atim.tv_sec,
+    root_fs_dir_stat.st_mtim.tv_sec, root_fs_dir_stat.st_ctim.tv_sec, (int)root_fs_dir_stat.st_uid,
     (int)root_fs_dir_stat.st_gid, std::nullopt};
 
-    FSMetadataCollection::create_entry_with_dir_parent(
-    (INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR, fs_metadata_collection_entry);
+    FSMetadataCollection::create_entry_with_dir_parent((INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR, fs_metadata_collection_entry);
 }
 
 bool MongoManager::parent_dir_is_root(const char* path) {

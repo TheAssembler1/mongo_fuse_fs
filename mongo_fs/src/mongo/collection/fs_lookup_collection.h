@@ -27,8 +27,7 @@ namespace mongo {
 
 class FSLookupCollectionEntry {
     public:
-    FSLookupCollectionEntry(INODE inode, FS_DATA_ID fs_data_id)
-    : inode{inode}, fs_data_id{fs_data_id} {
+    FSLookupCollectionEntry(INODE inode, FS_DATA_ID fs_data_id) : inode{inode}, fs_data_id{fs_data_id} {
     }
     FSLookupCollectionEntry(INODE inode, int order, FS_DATA_ID fs_data_id)
     : inode{inode}, order{order}, fs_data_id{fs_data_id} {
@@ -49,10 +48,8 @@ class FSLookupCollectionEntry {
 class FSLookupCollection {
     public:
     static std::optional<int> get_max_order(INODE inode);
-    static std::optional<int> create_next_entry(
-    FSLookupCollectionEntry& fs_lookup_collection_entry);
-    static std::optional<FSLookupCollectionEntry>
-    read_entry_with_inode_order(INODE inode, int order);
+    static std::optional<int> create_next_entry(FSLookupCollectionEntry& fs_lookup_collection_entry);
+    static std::optional<FSLookupCollectionEntry> read_entry_with_inode_order(INODE inode, int order);
     static std::vector<FS_DATA_ID> get_fs_data_ids(INODE inode);
 
     static constexpr std::string_view NAME = "fs_lookup";

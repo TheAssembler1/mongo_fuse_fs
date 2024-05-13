@@ -1,17 +1,13 @@
 #include <cstring>
 #include <iostream>
 
-#define PRETEST_PRINT(test_name) \
-    std::cout << "Begin test: " << test_name << std::endl
-#define POSTTEST_PRINT(test_name) \
-    std::cout << "Succeeded: " << test_name << std::endl
+#define PRETEST_PRINT(test_name) std::cout << "Begin test: " << test_name << std::endl
+#define POSTTEST_PRINT(test_name) std::cout << "Succeeded: " << test_name << std::endl
 #define TEST_FAILED(test_name, reason)                                           \
     std::cout << "Failed: " << test_name << ", reason: " << reason << std::endl; \
     return -1
-#define START_ACTION_PRINT(action) \
-    std::cout << "Begin action: " << action << std::endl
-#define STOP_ACTION_PRINT(action) \
-    std::cout << "Stop action: " << action << std::endl
+#define START_ACTION_PRINT(action) std::cout << "Begin action: " << action << std::endl
+#define STOP_ACTION_PRINT(action) std::cout << "Stop action: " << action << std::endl
 #define CREATE_FILE_PATH(mnt_path, file_name) (mnt_path + file_name)
 #define PRINT_ERRNO_ERROR(er) std::cerr << std::strerror(er) << std::endl
 

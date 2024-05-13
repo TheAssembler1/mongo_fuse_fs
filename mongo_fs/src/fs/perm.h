@@ -13,8 +13,7 @@ enum class PermBits {
 };
 
 struct Perm {
-    Perm(bool read, bool write, bool exec)
-    : read{read}, write{write}, exec{exec} {
+    Perm(bool read, bool write, bool exec) : read{read}, write{write}, exec{exec} {
     }
     Perm() : read{false}, write{false}, exec{false} {
     }

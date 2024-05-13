@@ -39,12 +39,7 @@ class Operations {
     static int removexattr(const char*, const char*);
 #endif
     static int opendir(const char* path, fuse_file_info*);
-    static int readdir(const char* path,
-    void* data,
-    fuse_fill_dir_t filler,
-    off_t offset,
-    fuse_file_info* ffi,
-    fuse_readdir_flags fdf);
+    static int readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf);
     static int releasedir(const char*, fuse_file_info*);
     static int fsyncdir(const char*, int, fuse_file_info*);
     static void* init(fuse_conn_info*, fuse_config*);
@@ -60,8 +55,7 @@ class Operations {
     static int read_buf(const char*, fuse_bufvec**, size_t, off_t, fuse_file_info*);
     static int flock(const char*, fuse_file_info*, int);
     static int fallocate(const char*, int, off_t, off_t, fuse_file_info*);
-    static ssize_t
-    copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int);
+    static ssize_t copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int);
     static off_t lseek(const char*, off_t, int, fuse_file_info*);
 
     public:
@@ -109,9 +103,7 @@ class Operations {
     .fallocate = fallocate,
     };
 
-    static constexpr struct fuse_config mongo_fuse_fs_config {
-        .use_ino = true, .nullpath_ok = true,
-    };
+    static constexpr struct fuse_config mongo_fuse_fs_config { .use_ino = true, .nullpath_ok = true, };
 };
 
 }; // namespace fs

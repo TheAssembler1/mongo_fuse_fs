@@ -3,8 +3,7 @@
 #define FS_OPERATION_FAIL 1
 #define FS_OPERATION_SUCCESS 0
 
-#define NOT_IMPLEMENTED_WARNING \
-    std::cout << "WARNING: method " << __FUNCTION__ << " not implemented!" << std::endl
+#define NOT_IMPLEMENTED_WARNING std::cout << "WARNING: method " << __FUNCTION__ << " not implemented!" << std::endl
 #define PREHANDLER_PRINT                                            \
     std::cout << "===================================" << std::endl \
               << "executing function: " << __FUNCTION__ << " handler" << std::endl
@@ -38,8 +37,7 @@ int Operations::create(const char* path, mode_t mode, fuse_file_info* ffi) {
         std::cout << "getattr null ffi" << std::endl;
     }
 
-    mongo::FSMetadataCollectionEntry md_entry{
-    FSHelper::get_base_name_of_path(path).c_str(), mode, mongo::MDFileType::FILE};
+    mongo::FSMetadataCollectionEntry md_entry{FSHelper::get_base_name_of_path(path).c_str(), mode, mongo::MDFileType::FILE};
     mongo::FSMetadataCollection::create_entry(path, md_entry);
 
     POSTHANDLER_PRINT;
@@ -81,11 +79,11 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
         stat->st_size                             = md_entry.file_size.value();
         stat->st_gid                              = md_entry.gid;
         stat->st_uid                              = md_entry.uid;
-        stat->st_atim    = std::timespec{md_entry.last_access, 0};
-        stat->st_ctim    = std::timespec{md_entry.last_change, 0};
-        stat->st_mtim    = std::timespec{md_entry.last_modify, 0};
-        stat->st_blksize = FSConfig::BLOCK_SIZE;
-        stat->st_blocks = (md_entry.file_size.value() / FSConfig::BLOCK_SIZE) + 1;
+        stat->st_atim                             = std::timespec{md_entry.last_access, 0};
+        stat->st_ctim                             = std::timespec{md_entry.last_change, 0};
+        stat->st_mtim                             = std::timespec{md_entry.last_modify, 0};
+        stat->st_blksize                          = FSConfig::BLOCK_SIZE;
+        stat->st_blocks                           = (md_entry.file_size.value() / FSConfig::BLOCK_SIZE) + 1;
 
         return FS_OPERATION_SUCCESS;
     }
@@ -154,8 +152,7 @@ int Operations::opendir(const char* path, fuse_file_info* ffi) {
     PREHANDLER_PRINT;
     std::cout << "opendir called with path: " << path << std::endl;
 
-    auto fs_metadata_collection_entry_opt =
-    mongo::FSMetadataCollection::get_entry_from_path(path);
+    auto fs_metadata_collection_entry_opt = mongo::FSMetadataCollection::get_entry_from_path(path);
     if(!fs_metadata_collection_entry_opt.has_value()) {
         std::cerr << "not able to find dir with path: " << path << std::endl;
         return -ENOENT;
@@ -174,12 +171,7 @@ int Operations::opendir(const char* path, fuse_file_info* ffi) {
 // FIXME: don't pass NULL to stat struct of filler, I believe this makes it call
 // getattr on each path returned... FIMXE: is FUSE_FILL_DIR_PLUS the correct
 // macro to pass here?
-int Operations::readdir(const char* path,
-void* data,
-fuse_fill_dir_t filler,
-off_t offset,
-fuse_file_info* ffi,
-fuse_readdir_flags fdf) {
+int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) {
     PREHANDLER_PRINT;
 
     INODE parent_inode;
@@ -229,8 +221,7 @@ int Operations::write_buf(const char* path, fuse_bufvec* f_bvec, off_t offset, f
 
     std::cout << "buf_offset: " << offset << std::endl;
 
-    auto bytes_written =
-    mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, offset, *ffi);
+    auto bytes_written = mongo::CollectionHelper::write_fuse_bufvec_to_mongo(path, *f_bvec, offset, *ffi);
     std::cout << "total bytes written: " << bytes_written << std::endl;
 
     POSTHANDLER_PRINT;
@@ -247,45 +238,28 @@ int Operations::read_buf(const char* path, fuse_bufvec** f_bvec, size_t size, of
 }
 
 int Operations::utimens(const char* path, const timespec*, fuse_file_info*) U
-int Operations::readlink(const char*, char*, size_t) U
-int Operations::mknod(const char*, mode_t, dev_t) U
+int Operations::readlink(const char*, char*, size_t) U int Operations::mknod(const char*, mode_t, dev_t) U
 int Operations::unlink(const char*) U int Operations::rmdir(const char*) U
-int Operations::symlink(const char*, const char*) U
-int Operations::rename(const char*, const char*, unsigned int) U
-int Operations::link(const char*, const char*) U
-int Operations::chmod(const char*, mode_t, fuse_file_info*) U
+int Operations::symlink(const char*, const char*) U int Operations::rename(const char*, const char*, unsigned int) U
+int Operations::link(const char*, const char*) U int Operations::chmod(const char*, mode_t, fuse_file_info*) U
 int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U
 int Operations::truncate(const char*, off_t, fuse_file_info*) U
 int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) U
-int Operations::write(const char* path,
-const char* buf,
-size_t buf_size,
-off_t buf_offset,
-fuse_file_info* ffi) U int Operations::statfs(const char*, struct statvfs*) U
-int Operations::flush(const char*, fuse_file_info*) U
-int Operations::release(const char*, fuse_file_info*) U
-int Operations::fsync(const char*, int, fuse_file_info*) U
+int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U
+int Operations::statfs(const char*, struct statvfs*) U int Operations::flush(const char*, fuse_file_info*) U
+int Operations::release(const char*, fuse_file_info*) U int Operations::fsync(const char*, int, fuse_file_info*) U
 #ifdef HAVE_SETXATTR
 int Operations::setxattr(const char*, const char*, const char*, size_t, int) U;
 int Operations::getxattr(const char* path, const char* name, char* value, size_t size) U;
 int Operations::listxattr(const char*, char*, size_t) U;
 int Operations::removexattr(const char*, const char*) U;
 #endif
-int Operations::releasedir(const char*, fuse_file_info*) U
-int Operations::fsyncdir(const char*, int, fuse_file_info*) U
+int Operations::releasedir(const char*, fuse_file_info*) U int Operations::fsyncdir(const char*, int, fuse_file_info*) U
 void Operations::destroy(void*) U_VOID int Operations::access(const char*, int) U
-int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U
-int Operations::bmap(const char*, size_t, uint64_t*) U
+int Operations::lock(const char*, fuse_file_info*, int, struct flock*) U int Operations::bmap(const char*, size_t, uint64_t*) U
 int Operations::ioctl(const char*, unsigned int, void*, fuse_file_info*, unsigned int, void*) U
 int Operations::poll(const char*, fuse_file_info*, fuse_pollhandle*, unsigned*) U
 int Operations::flock(const char*, fuse_file_info*, int) U
 int Operations::fallocate(const char*, int, off_t, off_t, fuse_file_info*) U ssize_t
-Operations::copy_file_range(const char*,
-fuse_file_info*,
-off_t,
-off_t,
-const char*,
-fuse_file_info*,
-off_t,
-size_t,
-int) U off_t Operations::lseek(const char*, off_t, int, fuse_file_info*) U
+Operations::copy_file_range(const char*, fuse_file_info*, off_t, off_t, const char*, fuse_file_info*, off_t, size_t, int) U off_t
+Operations::lseek(const char*, off_t, int, fuse_file_info*) U

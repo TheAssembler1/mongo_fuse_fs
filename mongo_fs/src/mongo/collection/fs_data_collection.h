@@ -23,8 +23,7 @@ class FSDataCollectionEntry {
     public:
     FSDataCollectionEntry(const FSDataCollectionEntry&)            = delete;
     FSDataCollectionEntry& operator=(const FSDataCollectionEntry&) = delete;
-    FSDataCollectionEntry(FS_DATA_ID data_id, char* _buf)
-    : fs_data_id{data_id}, buf{_buf} {
+    FSDataCollectionEntry(FS_DATA_ID data_id, char* _buf) : fs_data_id{data_id}, buf{_buf} {
     }
     FSDataCollectionEntry(FSDataCollectionEntry&& entry) {
         fs_data_id = entry.fs_data_id;

@@ -11,30 +11,25 @@ const value FSMetadataCollectionEntry::to_document() {
         final_size = file_size.value();
     }
 
-    return make_document(kvp(INODE_KEY, inode),
-    kvp(PARENT_DIR_INODE_KEY, parent_dir_inode), kvp(BASE_NAME_KEY, base_name),
+    return make_document(kvp(INODE_KEY, inode), kvp(PARENT_DIR_INODE_KEY, parent_dir_inode), kvp(BASE_NAME_KEY, base_name),
 
     // md type
     kvp(FILE_TYPE_KEY, file_type),
 
     // user perms
-    kvp(USER_MODE_READ_KEY, mode.user_perm.read),
-    kvp(USER_MODE_WRITE_KEY, mode.user_perm.write),
+    kvp(USER_MODE_READ_KEY, mode.user_perm.read), kvp(USER_MODE_WRITE_KEY, mode.user_perm.write),
     kvp(USER_MODE_EXEC_KEY, mode.user_perm.exec),
 
     // group perms
-    kvp(GROUP_MODE_READ_KEY, mode.user_perm.read),
-    kvp(GROUP_MODE_WRITE_KEY, mode.user_perm.write),
+    kvp(GROUP_MODE_READ_KEY, mode.user_perm.read), kvp(GROUP_MODE_WRITE_KEY, mode.user_perm.write),
     kvp(GROUP_MODE_EXEC_KEY, mode.user_perm.exec),
 
     // univ perms
-    kvp(UNIV_MODE_READ_KEY, mode.user_perm.read),
-    kvp(UNIV_MODE_WRITE_KEY, mode.user_perm.write),
+    kvp(UNIV_MODE_READ_KEY, mode.user_perm.read), kvp(UNIV_MODE_WRITE_KEY, mode.user_perm.write),
     kvp(UNIV_MODE_EXEC_KEY, mode.user_perm.exec),
 
     // set timestamps
-    kvp(LAST_ACCESS_KEY, last_access), kvp(LAST_MODIFY_KEY, last_modify),
-    kvp(LAST_CHANGE_KEY, last_change),
+    kvp(LAST_ACCESS_KEY, last_access), kvp(LAST_MODIFY_KEY, last_modify), kvp(LAST_CHANGE_KEY, last_change),
 
     // set id's
     kvp(UID_KEY, (int)uid), kvp(GID_KEY, (int)gid),
@@ -48,8 +43,8 @@ void FSMetadataCollection::remove_mtn_dir() {
     Connection conn;
     auto ms_data_collection = GET_FS_METADATA_COLLECTION(&conn);
 
-    ms_data_collection.delete_one(make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY,
-    (INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR)));
+    ms_data_collection.delete_one(
+    make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, (INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR)));
 }
 
 void FSMetadataCollection::update_md_entry_size(INODE inode, int size) {
@@ -57,19 +52,15 @@ void FSMetadataCollection::update_md_entry_size(INODE inode, int size) {
     auto collection = GET_FS_METADATA_COLLECTION(&conn);
 
     collection.update_one(make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, inode)),
-    make_document(
-    kvp("$set", make_document(kvp(FSMetadataCollectionEntry::FILE_SIZE_KEY, size)))));
+    make_document(kvp("$set", make_document(kvp(FSMetadataCollectionEntry::FILE_SIZE_KEY, size)))));
 }
 
-FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name,
-mode_t _mode,
-MDFileType _file_type) {
+FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name, mode_t _mode, MDFileType _file_type) {
     inode = MongoManager::generate_id();
 
     base_name = std::string(_base_name);
-    file_type = (_file_type == MDFileType::FILE) ?
-    FSMetadataCollectionEntry::FILE_TYPE_FILE_VALUE :
-    FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE;
+    file_type = (_file_type == MDFileType::FILE) ? FSMetadataCollectionEntry::FILE_TYPE_FILE_VALUE :
+                                                   FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE;
     mode      = fs::Mode{_mode};
 
     auto fuse_context = fuse_get_context();
@@ -82,8 +73,7 @@ MDFileType _file_type) {
     gid = (int)fuse_context->gid;
 }
 
-std::optional<INODE> FSMetadataCollection::create_entry(const char* path,
-FSMetadataCollectionEntry& fs_metadata_collection_entry) {
+std::optional<INODE> FSMetadataCollection::create_entry(const char* path, FSMetadataCollectionEntry& fs_metadata_collection_entry) {
     // NOTE: veryfing valid path and getting parent inodec
     auto parent_dir_inode_opt = reach_parent_inode(path);
 
@@ -93,8 +83,7 @@ FSMetadataCollectionEntry& fs_metadata_collection_entry) {
 
     auto parent_dir_inode = parent_dir_inode_opt.value();
 
-    auto inode =
-    create_entry_with_dir_parent(parent_dir_inode, fs_metadata_collection_entry);
+    auto inode = create_entry_with_dir_parent(parent_dir_inode, fs_metadata_collection_entry);
 
     return inode;
 }
@@ -108,8 +97,7 @@ FSMetadataCollectionEntry& fs_metadata_collection_entry) {
         fs_metadata_collection_entry.file_size = 0;
 
         // NOTE: creating data and lookup entry for block 0
-        CollectionHelper::create_next_data_lookup_entries(
-        fs_metadata_collection_entry.inode);
+        CollectionHelper::create_next_data_lookup_entries(fs_metadata_collection_entry.inode);
     }
 
     Connection conn;
@@ -125,8 +113,7 @@ FSMetadataCollectionEntry& fs_metadata_collection_entry) {
 std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_inode(INODE inode) {
     Connection conn;
     auto md_collection = GET_FS_METADATA_COLLECTION(&conn);
-    auto doc           = md_collection.find_one(
-              make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, inode)));
+    auto doc           = md_collection.find_one(make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, inode)));
 
     if(!doc.has_value()) {
         return std::nullopt;
@@ -135,12 +122,10 @@ std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_inode(I
     return FSMetadataCollectionEntry::bson_to_md_entry(doc.value());
 }
 
-std::optional<FSMetadataCollectionEntry>
-FSMetadataCollection::search_by_base_name(std::string& base_name) {
+std::optional<FSMetadataCollectionEntry> FSMetadataCollection::search_by_base_name(std::string& base_name) {
     Connection conn;
     auto md_collection = GET_FS_METADATA_COLLECTION(&conn);
-    auto doc           = md_collection.find_one(
-              make_document(kvp(FSMetadataCollectionEntry::BASE_NAME_KEY, base_name)));
+    auto doc = md_collection.find_one(make_document(kvp(FSMetadataCollectionEntry::BASE_NAME_KEY, base_name)));
 
     if(!doc.has_value()) {
         return std::nullopt;
@@ -197,27 +182,23 @@ bool FSMetadataCollection::inode_is_parent(INODE parent_dir_inode, INODE child_i
     Connection conn;
     auto fs_metadata_collection = GET_FS_METADATA_COLLECTION(&conn);
 
-    auto doc_bson = fs_metadata_collection.find_one(
-    make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, child_inode)));
+    auto doc_bson = fs_metadata_collection.find_one(make_document(kvp(FSMetadataCollectionEntry::INODE_KEY, child_inode)));
     assert(doc_bson);
 
-    auto fs_metadata_collection_entry =
-    FSMetadataCollectionEntry::bson_to_md_entry(doc_bson.value());
+    auto fs_metadata_collection_entry = FSMetadataCollectionEntry::bson_to_md_entry(doc_bson.value());
 
     return fs_metadata_collection_entry.get_parent_dir_inode() == parent_dir_inode;
 }
 
-std::vector<FSMetadataCollectionEntry>
-FSMetadataCollection::get_child_md_entries_of_parent_dir(INODE parent_dir_inode) {
+std::vector<FSMetadataCollectionEntry> FSMetadataCollection::get_child_md_entries_of_parent_dir(INODE parent_dir_inode) {
     std::vector<FSMetadataCollectionEntry> res{};
     Connection conn;
     auto fs_metadata_collection = GET_FS_METADATA_COLLECTION(&conn);
-    auto docs_bson              = fs_metadata_collection.find(make_document(
-                 kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, parent_dir_inode)));
+    auto docs_bson =
+    fs_metadata_collection.find(make_document(kvp(FSMetadataCollectionEntry::PARENT_DIR_INODE_KEY, parent_dir_inode)));
 
     for(auto doc_bson : docs_bson) {
-        auto fs_metadata_collection_entry =
-        FSMetadataCollectionEntry::bson_to_md_entry(doc_bson);
+        auto fs_metadata_collection_entry = FSMetadataCollectionEntry::bson_to_md_entry(doc_bson);
         res.push_back(fs_metadata_collection_entry);
     }
 
@@ -225,10 +206,8 @@ FSMetadataCollection::get_child_md_entries_of_parent_dir(INODE parent_dir_inode)
 }
 
 std::optional<FSMetadataCollectionEntry>
-FSMetadataCollection::get_child_entry_from_parent_inode(INODE parent_dir_inode,
-std::string& child_base_name) {
-    std::vector<FSMetadataCollectionEntry> children =
-    get_child_md_entries_of_parent_dir(parent_dir_inode);
+FSMetadataCollection::get_child_entry_from_parent_inode(INODE parent_dir_inode, std::string& child_base_name) {
+    std::vector<FSMetadataCollectionEntry> children = get_child_md_entries_of_parent_dir(parent_dir_inode);
 
     for(auto child : children) {
         if(child.base_name == child_base_name) {
@@ -248,14 +227,12 @@ FSMetadataCollectionEntry FSMetadataCollection::get_md_entry_of_fs_root_dir() {
     return entry;
 }
 
-std::optional<FSMetadataCollectionEntry>
-FSMetadataCollection::get_entry_from_path(const char* path) {
+std::optional<FSMetadataCollectionEntry> FSMetadataCollection::get_entry_from_path(const char* path) {
     std::string base_name = fs::FSHelper::get_base_name_of_path(path);
     auto parent_inode_opt = reach_parent_inode(path);
 
     if(!parent_inode_opt.has_value()) {
-        std::cerr << "ERROR: parent inode was inode from path: " << path
-                  << " found!" << std::endl;
+        std::cerr << "ERROR: parent inode was inode from path: " << path << " found!" << std::endl;
         return std::nullopt;
     }
 
@@ -281,8 +258,7 @@ std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) 
     assert(path_components.size() >= 1);
 
     if(path_components.size() == 1) {
-        std::cout << "path components vector of size 1: " << path_components[0]
-                  << std::endl;
+        std::cout << "path components vector of size 1: " << path_components[0] << std::endl;
 
         if(path_components[0] == "/") {
             std::cout << "fs root dir specified by reach_parent_inode" << std::endl;
@@ -303,12 +279,9 @@ std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) 
             break;
         }
 
-        auto child_entry_opt = get_child_entry_from_parent_inode(
-        cur_parent_dir_inode, path_components[i + 1]);
+        auto child_entry_opt = get_child_entry_from_parent_inode(cur_parent_dir_inode, path_components[i + 1]);
         if(!child_entry_opt.has_value()) {
-            std::cerr << path_components[i + 1]
-                      << " was not a child of inode: " << cur_parent_dir_inode
-                      << std::endl;
+            std::cerr << path_components[i + 1] << " was not a child of inode: " << cur_parent_dir_inode << std::endl;
             return std::nullopt;
         }
         auto child_entry     = child_entry_opt.value();
@@ -316,8 +289,7 @@ std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) 
 
         // FIXME: convert to enum when deserializing from bson
         if(child_entry.file_type != std::string("dir")) {
-            std::cerr << "child inode: " << child_entry.inode
-                      << " was not a dir entry" << std::endl;
+            std::cerr << "child inode: " << child_entry.inode << " was not a dir entry" << std::endl;
         }
     }
 
@@ -325,13 +297,12 @@ std::optional<INODE> FSMetadataCollection::reach_parent_inode(const char* path) 
 }
 
 FSMetadataCollectionEntry FSMetadataCollectionEntry::bson_to_md_entry(view bson_doc) {
-    fs::Mode mode(fs::Perm{bson_doc[USER_MODE_READ_KEY].get_bool(),
-                  bson_doc[USER_MODE_WRITE_KEY].get_bool(),
+    fs::Mode mode(fs::Perm{bson_doc[USER_MODE_READ_KEY].get_bool(), bson_doc[USER_MODE_WRITE_KEY].get_bool(),
                   bson_doc[USER_MODE_EXEC_KEY].get_bool()},
-    fs::Perm{bson_doc[GROUP_MODE_READ_KEY].get_bool(),
-    bson_doc[GROUP_MODE_WRITE_KEY].get_bool(), bson_doc[GROUP_MODE_EXEC_KEY].get_bool()},
-    fs::Perm{bson_doc[UNIV_MODE_READ_KEY].get_bool(),
-    bson_doc[UNIV_MODE_WRITE_KEY].get_bool(), bson_doc[UNIV_MODE_EXEC_KEY].get_bool()});
+    fs::Perm{bson_doc[GROUP_MODE_READ_KEY].get_bool(), bson_doc[GROUP_MODE_WRITE_KEY].get_bool(),
+    bson_doc[GROUP_MODE_EXEC_KEY].get_bool()},
+    fs::Perm{bson_doc[UNIV_MODE_READ_KEY].get_bool(), bson_doc[UNIV_MODE_WRITE_KEY].get_bool(),
+    bson_doc[UNIV_MODE_EXEC_KEY].get_bool()});
 
     time_t last_access = bson_doc[LAST_ACCESS_KEY].get_int64();
     time_t last_modify = bson_doc[LAST_MODIFY_KEY].get_int64();
@@ -350,10 +321,9 @@ FSMetadataCollectionEntry FSMetadataCollectionEntry::bson_to_md_entry(view bson_
         final_file_size = file_size;
     }
 
-    auto entry = FSMetadataCollectionEntry(inode,
-    std::string(bson_doc[BASE_NAME_KEY].get_string()),
-    std::string(bson_doc[FILE_TYPE_KEY].get_string()), mode, time(&last_access),
-    time(&last_modify), time(&last_change), uid, gid, final_file_size);
+    auto entry = FSMetadataCollectionEntry(inode, std::string(bson_doc[BASE_NAME_KEY].get_string()),
+    std::string(bson_doc[FILE_TYPE_KEY].get_string()), mode, time(&last_access), time(&last_modify), time(&last_change),
+    uid, gid, final_file_size);
 
     entry.set_parent_dir_inode(parent_dir_inode);
 
