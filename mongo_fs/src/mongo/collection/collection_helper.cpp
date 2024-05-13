@@ -33,7 +33,6 @@ void CollectionHelper::print_all_file(INODE inode) {
 int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, off_t offset, fuse_file_info& ffi) {
     assert(f_bvec.off == 0);
 
-    // NOTE: gettting metadata for file
     auto metadata_entry = FSMetadataCollection::search_by_inode(ffi.fh).value();
 
     int cur_file_size       = metadata_entry.file_size.value();
@@ -101,7 +100,6 @@ int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& 
 // FIXME: currently copying bytes over could just point to bson buffers in f
 // bvec...
 void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info& ffi) {
-    // NOTE: gettting metadata for file
     auto metadata_entry = FSMetadataCollection::search_by_inode(ffi.fh).value();
 
     std::cout << "num bytes requested: " << size << std::endl;
@@ -147,4 +145,33 @@ void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec**
             pos_in_block++;
         }
     }
+}
+
+static void truncate_file(INODE inode, off_t new_size) {
+    auto metadata_entry = FSMetadataCollection::search_by_inode(inode).value();
+
+    if(metadata_entry.file_size.value() == new_size) {
+        std::cout << "truncate size same size as original file" << std::endl;
+        return;
+    }
+
+    int cur_blocks     = (metadata_entry.file_size.value() / fs::FSConfig::BLOCK_SIZE) + 1;
+    int new_block_size = (new_size / fs::FSConfig::BLOCK_SIZE) + 1;
+
+    if(cur_blocks < new_block_size) {
+        std::cout << "block size larger with truncate" << std::endl;
+
+        for(int i = 0; i < new_block_size - cur_blocks; i++) {
+            create_next_data_lookup_entries((INODE)ffi.fh);
+        }
+    } else if(new_block_size > cur_blocks) {
+        std::cout << "block size smaller with truncate" << std::endl;
+        // FIXME: implement decreasing truncation with removing blocks
+        throw std::runtime_error("ERROR: decreasing trunk size requiring deleted blocks not implemented");
+    } else {
+        std::cout << "block size unchanged with truncate" << std::endl;
+    }
+
+    std::cout << "updating file size: " << new_size << std::endl;
+    FSMetadataCollection::update_md_entry_size((INODE)ffi.fh, new_size);
 }

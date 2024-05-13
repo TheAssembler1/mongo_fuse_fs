@@ -23,6 +23,13 @@
         NOT_IMPLEMENTED_WARNING; \
         POSTHANDLER_PRINT;       \
     }
+#define U_CRASH                                                                                 \
+    {                                                                                           \
+        PREHANDLER_PRINT;                                                                       \
+        NOT_IMPLEMENTED_WARNING;                                                                \
+        POSTHANDLER_PRINT;                                                                      \
+        throw std::runtime_error(std::string{"unimplemented function: "}.append(__FUNCTION__)); \
+    }
 
 using namespace fs;
 
@@ -123,26 +130,25 @@ int Operations::open(const char* path, fuse_file_info* ffi) {
     ffi->fh = md_entry.inode;
 
     // FIXME: bad string output. maybe build up string?
-    std::cout << "file opened with the following flags: ";
+    std::cout << "file opened with the following flags: " << std::endl;
 
     // exclusive file flags
     if(ffi->flags & O_RDONLY) {
-        std::cout << std::endl;
+        std::cout << "O_RDONLY" << std::endl;
         return FS_OPERATION_SUCCESS;
     }
     if(ffi->flags & O_WRONLY) {
-        std::cout << "O_WRONLY ";
+        std::cout << "O_WRONLY" << std::endl;
         return FS_OPERATION_SUCCESS;
-        std::cout << std::endl;
     }
 
     if(ffi->flags & O_RDWR) {
-        std::cout << "O_RDWR ";
+        std::cout << "O_RDWR" << std::endl;
     }
     if(ffi->flags & O_APPEND) {
-        std::cout << "O_APPEND ";
+        std::cout << "O_APPEND" << std::endl;
     }
-    std::cout << std::endl;
+
     POSTHANDLER_PRINT;
 
     return FS_OPERATION_SUCCESS;
@@ -237,14 +243,32 @@ int Operations::read_buf(const char* path, fuse_bufvec** f_bvec, size_t size, of
     return FS_OPERATION_SUCCESS;
 }
 
+int Operations::truncate(const char* path, off_t new_size, fuse_file_info* ffi) {
+    PREHANDLER_PRINT;
+
+    if(!path) {
+        std::cout << "truncate path was null" << std::endl;
+    } else {
+        std::cout << "truncate path: " << path << std::endl;
+    }
+
+    if(!ffi) {
+        std::cout << "truncate ffi was null" << std::endl;
+    }
+    { std::cout << "truncate fd: " << ffi->fh << std::endl; }
+
+
+    POSTHANDLER_PRINT;
+    return FS_OPERATION_SUCCESS;
+}
+
 int Operations::utimens(const char* path, const timespec*, fuse_file_info*) U
 int Operations::readlink(const char*, char*, size_t) U int Operations::mknod(const char*, mode_t, dev_t) U
 int Operations::unlink(const char*) U int Operations::rmdir(const char*) U
 int Operations::symlink(const char*, const char*) U int Operations::rename(const char*, const char*, unsigned int) U
 int Operations::link(const char*, const char*) U int Operations::chmod(const char*, mode_t, fuse_file_info*) U
 int Operations::chown(const char*, uid_t, gid_t, fuse_file_info*) U
-int Operations::truncate(const char*, off_t, fuse_file_info*) U
-int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) U
+int Operations::read(const char* path, char* ret_buf, size_t size, off_t offset, fuse_file_info* ffi) U_CRASH
 int Operations::write(const char* path, const char* buf, size_t buf_size, off_t buf_offset, fuse_file_info* ffi) U
 int Operations::statfs(const char*, struct statvfs*) U int Operations::flush(const char*, fuse_file_info*) U
 int Operations::release(const char*, fuse_file_info*) U int Operations::fsync(const char*, int, fuse_file_info*) U

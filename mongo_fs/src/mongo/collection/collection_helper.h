@@ -21,6 +21,7 @@ class CollectionHelper {
     static int write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& f_bvec, off_t offset, fuse_file_info& ffi);
     static void read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec** _f_bvec, size_t size, off_t offset, fuse_file_info& ffi);
     static void print_all_file(INODE inode);
+    static void truncate_file(INODE inode, off_t new_size);
 };
 
 } // namespace mongo
