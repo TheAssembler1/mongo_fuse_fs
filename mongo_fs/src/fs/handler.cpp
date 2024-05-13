@@ -67,7 +67,8 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     stat->st_atim = std::timespec{md_entry.last_access, 0};
     stat->st_ctim = std::timespec{md_entry.last_change, 0};
     stat->st_mtim = std::timespec{md_entry.last_modify, 0};
-    stat->st_blksize = BLOCK_SIZE;
+    stat->st_blksize = FSConfig::BLOCK_SIZE;
+    stat->st_blocks = (md_entry.file_size.value() / FSConfig::BLOCK_SIZE) + 1;
 
     return FS_OPERATION_SUCCESS;
   }
@@ -151,7 +152,7 @@ int Operations::opendir(const char* path, fuse_file_info* ffi) {
 
 // NOTE: MODE 1: https://libfuse.github.io/doxygen/structfuse__operations.html#ae269583c4bfaf4d9a82e1d51a902cd5c
 // FIXME: don't pass NULL to stat struct of filler, I believe this makes it call getattr on each path returned...
-// FIMXES: is FUSE_FILL_DIR_PLUS the correct macro to pass here?
+// FIMXE: is FUSE_FILL_DIR_PLUS the correct macro to pass here?
 int Operations::readdir(const char* path, void* data, fuse_fill_dir_t filler, off_t offset, fuse_file_info* ffi, fuse_readdir_flags fdf) {
   PREHANDLER_PRINT;
 
@@ -190,7 +191,7 @@ void* Operations::init(fuse_conn_info*, fuse_config* fg) {
   fg->nullpath_ok = mongo_fuse_fs_config.nullpath_ok;
   fg->use_ino = mongo_fuse_fs_config.use_ino;
 
-  mongo::Manager::init_db();
+  mongo::MongoManager::init_db();
 
   POSTHANDLER_PRINT;
   return nullptr;

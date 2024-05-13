@@ -15,12 +15,13 @@ FSLookupCollectionEntry FSLookupCollectionEntry::bson_to_entry(value bson_doc) {
   );
 }
 
-std::optional<int> FSLookupCollection::get_max_order() {
+std::optional<int> FSLookupCollection::get_max_order(INODE inode) {
     Connection conn;
 
     auto fs_blocks_collection = GET_FS_LOOKUP_COLLECTION(&conn);
 
     auto query_pipeline = mongocxx::pipeline();
+    query_pipeline.match(make_document(kvp(FSLookupCollectionEntry::INODE_KEY, inode)));
     query_pipeline.sort(make_document(kvp(FSLookupCollectionEntry::ORDER_KEY, MONGO_DESC_ORDER)));
     query_pipeline.limit(1);
 
@@ -37,7 +38,7 @@ std::optional<int> FSLookupCollection::get_max_order() {
 std::optional<int> FSLookupCollection::create_next_entry(FSLookupCollectionEntry& fs_lookup_collection_entry) {
   Connection conn; 
   auto fs_lookup_collection = GET_FS_LOOKUP_COLLECTION(&conn);
-  auto last_order = get_max_order();
+  auto last_order = get_max_order(fs_lookup_collection_entry.inode);
 
   FS_DATA_ID cur_order = 0;
   if(last_order.has_value()) {

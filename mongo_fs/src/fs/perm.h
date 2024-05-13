@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __PERM_H__
+#define __PERM_H__
 
 #include <sys/stat.h>
 
@@ -39,3 +40,5 @@ namespace fs {
   };
 
 }
+
+#endif

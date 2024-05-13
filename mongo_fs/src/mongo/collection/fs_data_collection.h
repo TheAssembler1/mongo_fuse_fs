@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __FS_DATA_COLLECTION_H__
+#define __FS_DATA_COLLECTION_H__
 
 #include <mongocxx/client.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
@@ -6,17 +7,16 @@
 #include <vector>
 #include <cassert>
 #include <optional>
-#include <optional>
 
-#include "types.h"
-#include "fs_lookup_collection.h"
-#include "fs_metadata_collection.h"
+#include "../../fs/fs_config.h"
 #include "../connection.h"
-#include "../manager.h"
-
-#define BLOCK_SIZE 512
+#include "types.h"
 
 using bsoncxx::document::value;
+using bsoncxx::types::b_binary;
+using bsoncxx::binary_sub_type;
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_document;
 
 namespace mongo {
   class FSDataCollectionEntry {
@@ -29,7 +29,7 @@ namespace mongo {
         buf = entry.buf;
         entry.buf = nullptr;
       }
-      FSDataCollectionEntry() : buf{new char[BLOCK_SIZE]()} {}
+      FSDataCollectionEntry() : buf{new char[fs::FSConfig::BLOCK_SIZE]()} {}
 
       static FSDataCollectionEntry bson_to_entry(value bson_doc);
 
@@ -49,7 +49,6 @@ namespace mongo {
 
   class FSDataCollection {
     public:
-      // NOTE: read entry and create entry will always act upon BLOCK_SIZE bytes of data
       static std::optional<FS_DATA_ID> create_entry(FSDataCollectionEntry& fs_data_collection_entry);
       static std::optional<FSDataCollectionEntry> read_entry(FS_DATA_ID fs_data_id);
       static void update_entry(FSDataCollectionEntry& fs_data_collection_entry);
@@ -57,3 +56,5 @@ namespace mongo {
       static constexpr std::string_view NAME = "fs_data";
   };
 }
+
+#endif

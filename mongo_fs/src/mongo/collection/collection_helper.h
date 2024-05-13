@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __COLLECTION_HELPER_H__
+#define __COLLECTION_HELPER_H__
 
 // NOTE: needed to establish fuse version early
 #define FUSE_USE_VERSION 35
@@ -6,7 +7,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "../manager.h"
+#include "../mongo_manager.h"
 #include "fs_metadata_collection.h"
 #include "fs_data_collection.h"
 #include "fs_lookup_collection.h"
@@ -24,3 +25,4 @@ namespace mongo {
 
 }
 
+#endif

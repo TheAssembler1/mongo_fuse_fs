@@ -50,7 +50,7 @@ struct stat FSHelper::get_stat_of_root_fs() {
   struct stat res_stat;
   memset(&res_stat, 0, sizeof(struct stat));
 
-  if(stat(mongo::Manager::fs_root_path.c_str(), &res_stat) <= 0) {
+  if(stat(mongo::MongoManager::fs_root_path.c_str(), &res_stat) <= 0) {
     std::cout << "succesfully stat root fs dir" << std::endl;
     return res_stat;
   } else {

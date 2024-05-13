@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __MANAGER_H__
+#define __MANAGER_H__
 
 // NOTE: needed to establish fuse version early
 #define FUSE_USE_VERSION 35
@@ -13,22 +14,25 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#include "collection/fs_metadata_collection.h"
 #include "connection.h"
 #include "../fs/perm.h"
 #include "../fs/fs_helper.h"
 
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_document;
+using bsoncxx::builder::basic::array;
+using bsoncxx::builder::basic::document;
+
 // NOTE: for database =========================================
 // the name of the database used to store all fs data
 #define ROOT_DB_NAME "fs_root"
-#define BLOCK_SIZE 512
 // FIXME: put somewhere better?
 #define MAX_FS_ROOT_PATH 256
 #define PARENT_DIR_INODE_OF_ROOT_FS_DIR 0
 
 namespace mongo {
 
-  class Manager {
+  class MongoManager {
     public:
       static void init_db();
       static int generate_id();
@@ -41,3 +45,5 @@ namespace mongo {
 
 
 }
+
+#endif

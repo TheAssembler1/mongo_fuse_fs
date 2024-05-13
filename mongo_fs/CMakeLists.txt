@@ -27,7 +27,7 @@ set(SOURCES
     src/fs/handler.cpp
     src/fs/perm.cpp
     src/fs/fs_helper.cpp
-    src/mongo/manager.cpp
+    src/mongo/mongo_manager.cpp
     src/mongo/collection/fs_metadata_collection.cpp
     src/mongo/collection/fs_data_collection.cpp
     src/mongo/collection/fs_lookup_collection.cpp
@@ -35,7 +35,8 @@ set(SOURCES
 )
 
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES}
+    src/fs/fs_config.h)
 
 # Include FUSE headers
 target_include_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_HEADERS}")

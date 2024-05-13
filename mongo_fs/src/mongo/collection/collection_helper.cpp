@@ -22,7 +22,7 @@ void CollectionHelper::print_all_file(INODE inode) {
   for(auto id: fs_ids) {
     auto entry = FSDataCollection::read_entry(id).value();
 
-    for(int i = 0; i < BLOCK_SIZE; i++) {
+    for(int i = 0; i < fs::FSConfig::BLOCK_SIZE; i++) {
       std::cout << entry.buf[i];
     }
   }
@@ -43,7 +43,7 @@ int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& 
     fuse_buf f_buf = f_bvec.buf[f_bvec.idx];
     assert(f_buf.fd == 0);
 
-    int cur_blocks = (cur_file_size / BLOCK_SIZE) + 1;
+    int cur_blocks = (cur_file_size / fs::FSConfig::BLOCK_SIZE) + 1;
     int starting_fp = offset;
     int cur_fp = starting_fp;
     int buf_size = f_buf.size;
@@ -51,7 +51,7 @@ int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& 
     // NOTE: check if we need more blocks
     int additional_blocks_needed = 0;
     if(offset + f_buf.size > cur_file_size) {
-        int blocks_needed = ((offset + f_buf.size) / BLOCK_SIZE) + 1;
+        int blocks_needed = ((offset + f_buf.size) / fs::FSConfig::BLOCK_SIZE) + 1;
         additional_blocks_needed = blocks_needed - cur_blocks;
 
         // NOTE: increase cur_file_size for potential next iteration
@@ -66,7 +66,7 @@ int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& 
     }
 
     while(cur_fp - starting_fp < buf_size) {
-      int block_order = cur_fp / BLOCK_SIZE;
+      int block_order = cur_fp / fs::FSConfig::BLOCK_SIZE;
 
       std::cout << "writing block with order: " << block_order << std::endl;
       auto lookup_entry = FSLookupCollection::read_entry_with_inode_order(ffi.fh, block_order).value();
@@ -74,7 +74,7 @@ int CollectionHelper::write_fuse_bufvec_to_mongo(const char* path, fuse_bufvec& 
       auto data_entry = FSDataCollection::read_entry(lookup_entry.fs_data_id).value();
 
       // NOTE: start at current position within block based on FP
-      for(int pos_in_block = cur_fp % BLOCK_SIZE; pos_in_block < BLOCK_SIZE;) {
+      for(int pos_in_block = cur_fp % fs::FSConfig::BLOCK_SIZE; pos_in_block < fs::FSConfig::BLOCK_SIZE;) {
         // NOTE: ensuring we don't overwite in cur block
         if(cur_fp - starting_fp >= buf_size) {
             break;
@@ -124,7 +124,7 @@ void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec**
     int buf_size = size;
 
     while(cur_fp - starting_fp < buf_size) {
-      int block_order = cur_fp / BLOCK_SIZE;
+      int block_order = cur_fp / fs::FSConfig::BLOCK_SIZE;
 
       std::cout << "current fp: " << cur_fp << std::endl;
       std::cout << "reading block with order: " << block_order << std::endl;
@@ -133,7 +133,7 @@ void CollectionHelper::read_mongo_to_fuse_bufvec(const char* path, fuse_bufvec**
       auto data_entry = FSDataCollection::read_entry(lookup_entry.fs_data_id).value();
 
       // NOTE: start at current position within block based on FP
-      for(int pos_in_block = cur_fp % BLOCK_SIZE; pos_in_block < BLOCK_SIZE;) {
+      for(int pos_in_block = cur_fp % fs::FSConfig::BLOCK_SIZE; pos_in_block < fs::FSConfig::BLOCK_SIZE;) {
         // NOTE: ensuring we don't overread in cur block
         if(cur_fp - starting_fp >= buf_size || cur_fp >= file_size) {
             return;

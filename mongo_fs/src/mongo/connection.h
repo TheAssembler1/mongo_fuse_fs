@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __CONNECTION_H__
+#define __CONNECTION_H__
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/uri.hpp>
@@ -34,3 +35,5 @@ namespace mongo {
   };
 
 }
+
+#endif

@@ -1,13 +1,8 @@
-#include "manager.h"
-
-using bsoncxx::builder::basic::kvp;
-using bsoncxx::builder::basic::make_document;
-using bsoncxx::builder::basic::array;
-using bsoncxx::builder::basic::document;
+#include "mongo_manager.h"
 
 using namespace mongo;
 
-void Manager::init_db() {
+void MongoManager::init_db() {
   std::cout << "init database" << std::endl;
 
   // NOTE: removing previous mnt dir
@@ -32,7 +27,7 @@ void Manager::init_db() {
   FSMetadataCollection::create_entry_with_dir_parent((INODE)PARENT_DIR_INODE_OF_ROOT_FS_DIR, fs_metadata_collection_entry);
 }
 
-bool Manager::parent_dir_is_root(const char* path) {
+bool MongoManager::parent_dir_is_root(const char* path) {
   std::string cur_parent_path = fs::FSHelper::get_parent_dir_string(path);
   struct stat cur_parent_stat;
   struct stat fs_root_stat = fs::FSHelper::get_stat_of_root_fs();
@@ -50,7 +45,7 @@ bool Manager::parent_dir_is_root(const char* path) {
   return false;
 }
 
-int Manager::generate_id() {
+int MongoManager::generate_id() {
   std::random_device rd;
   std::mt19937_64 gen(rd());
   std::uniform_int_distribution<int> dis;

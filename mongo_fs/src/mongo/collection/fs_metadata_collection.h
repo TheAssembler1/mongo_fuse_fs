@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __FS_METADATA_COLLECTION_H__
+#define __FS_METADATA_COLLECTION_H__
 
 // NOTE: needed to establish fuse version early
 #define FUSE_USE_VERSION 35
@@ -13,7 +14,7 @@
 #include <vector>
 
 #include "../../fs/perm.h"
-#include "../manager.h"
+#include "../mongo_manager.h"
 #include "../connection.h"
 #include "fs_lookup_collection.h"
 #include "fs_data_collection.h"
@@ -98,3 +99,5 @@ namespace mongo {
     };
 
 }
+
+#endif

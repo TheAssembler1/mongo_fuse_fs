@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __FS_HELPER_H__
+#define __FS_HELPER_H__
 
 #include <iostream>
 #include <vector>
@@ -7,7 +8,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "../mongo/manager.h"
+#include "../mongo/mongo_manager.h"
 #include "../mongo/collection/types.h"
 
 namespace fs {
@@ -22,3 +23,5 @@ namespace fs {
   };
 
 }
+
+#endif

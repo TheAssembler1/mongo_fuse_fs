@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __HANDLER_H__
+#define __HANDLER_H__
 
 #include <iostream>
 
@@ -6,6 +7,7 @@
 #include "../mongo/collection/fs_lookup_collection.h"
 #include "../mongo/collection/fs_data_collection.h"
 #include "../mongo/collection/fs_metadata_collection.h"
+#include "../mongo/mongo_manager.h"
 #include "fs_helper.h"
 
 namespace fs {
@@ -109,5 +111,7 @@ namespace fs {
   };
 
 };
+
+#endif
 
 

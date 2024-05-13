@@ -67,7 +67,7 @@ void FSMetadataCollection::update_md_entry_size(INODE inode, int size) {
 }
 
 FSMetadataCollectionEntry::FSMetadataCollectionEntry(const char* _base_name, mode_t _mode, MDFileType _file_type) {
-  inode = Manager::generate_id();
+  inode = MongoManager::generate_id();
 
   base_name = std::string(_base_name);
   file_type = (_file_type == MDFileType::FILE) ? FSMetadataCollectionEntry::FILE_TYPE_FILE_VALUE : FSMetadataCollectionEntry::FILE_TYPE_DIR_VALUE;
