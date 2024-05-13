@@ -96,8 +96,8 @@ std::vector<FS_DATA_ID> FSLookupCollection::remove_above_order(INODE inode, int 
 
    auto query = make_document(
             kvp(FSLookupCollectionEntry::INODE_KEY, inode),
-            kvp("$gte", make_document(
-                  kvp(FSLookupCollectionEntry::ORDER_KEY, above_order)
+            kvp(FSLookupCollectionEntry::ORDER_KEY, make_document(
+                  kvp("$gte", above_order)
             ))
          );
    auto res_ids_bson = collection.find(query.view());

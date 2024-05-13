@@ -172,7 +172,7 @@ void CollectionHelper::truncate_file(INODE inode, off_t new_size) {
         for(int i = 0; i < new_block_size - cur_blocks; i++) {
             create_next_data_lookup_entries(inode);
         }
-    } else if(new_block_size > cur_blocks) {
+    } else if(cur_blocks > new_block_size) {
         std::cout << "block size smaller with truncate" << std::endl;
         remove_data_lookup_entries_above(inode, new_block_size + 1);
     } else {

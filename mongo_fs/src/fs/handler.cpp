@@ -56,7 +56,11 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
     PREHANDLER_PRINT;
 
     memset(stat, 0, sizeof(struct stat));
-    std::cout << "getattr path " << path << std::endl;
+    if(path) {
+      std::cout << "getattr non_null path " << path << std::endl;
+    } else {
+      std::cout << "getattr null path" << std::endl;
+    }
 
     if(ffi) {
         std::cout << "getattr non_null ffi: " << ffi->fh << std::endl;
@@ -64,7 +68,7 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
         std::cout << "getattr null ffi" << std::endl;
     }
 
-    if(strcmp(path, "/") == 0) {
+    if(path && strcmp(path, "/") == 0) {
         struct stat root_fs_dir_stat = FSHelper::get_stat_of_root_fs();
         memcpy(stat, &root_fs_dir_stat, sizeof(struct stat));
         return FS_OPERATION_SUCCESS;
@@ -257,6 +261,7 @@ int Operations::truncate(const char* path, off_t new_size, fuse_file_info* ffi) 
     }
     { std::cout << "truncate fd: " << ffi->fh << std::endl; }
 
+    mongo::CollectionHelper::truncate_file(ffi->fh, new_size);
 
     POSTHANDLER_PRINT;
     return FS_OPERATION_SUCCESS;
