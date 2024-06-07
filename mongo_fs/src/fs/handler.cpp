@@ -85,16 +85,23 @@ int Operations::getattr(const char* path, struct stat* stat, fuse_file_info* ffi
 
     if(md_entry_opt.has_value()) {
         mongo::FSMetadataCollectionEntry md_entry = md_entry_opt.value();
+
         stat->st_ino                              = md_entry.inode;
         stat->st_mode                             = md_entry.to_mode_t();
-        stat->st_size                             = md_entry.file_size.value();
         stat->st_gid                              = md_entry.gid;
         stat->st_uid                              = md_entry.uid;
         stat->st_atim                             = std::timespec{md_entry.last_access, 0};
         stat->st_ctim                             = std::timespec{md_entry.last_change, 0};
         stat->st_mtim                             = std::timespec{md_entry.last_modify, 0};
         stat->st_blksize                          = FSConfig::BLOCK_SIZE;
-        stat->st_blocks                           = (md_entry.file_size.value() / FSConfig::BLOCK_SIZE) + 1;
+
+        if(md_entry.file_size.has_value()) {
+            stat->st_size                             = md_entry.file_size.value();
+            stat->st_blocks                           = (md_entry.file_size.value() / FSConfig::BLOCK_SIZE) + 1;
+        } else {
+            stat->st_size = 0;
+            stat->st_blocks = 0;
+        }
 
         return FS_OPERATION_SUCCESS;
     }
